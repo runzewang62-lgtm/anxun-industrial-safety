@@ -25,7 +25,7 @@
     body { margin: 0; color: var(--ink); background: var(--paper); }
     button { font: inherit; }
     button:disabled, select:disabled { opacity: .58; cursor: not-allowed; }
-    .app { min-height: 100vh; display: grid; grid-template-columns: 238px 1fr; }
+    .app { min-height: 100vh; display: block; }
     .sidebar {
       height: 100vh; position: sticky; top: 0; padding: 26px 16px;
       display: flex; flex-direction: column; background: var(--teal-dark); color: #edf5f0;
@@ -42,8 +42,13 @@
     .site-card { margin-top: auto; padding: 14px; border: 1px solid #31534c; border-radius: 13px; font-size: 12px; }
     .site-card strong { display: block; margin-bottom: 5px; }
     .site-card span { color: #aac3b9; }
-    main { min-width: 0; padding: 28px clamp(18px, 3.2vw, 48px) 40px; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 26px; }
+    main { min-width: 0; max-width: 1760px; margin: auto; padding: 18px clamp(18px, 3.2vw, 48px) 40px; }
+    .sidebar { display: none; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .top-brand { display: flex; align-items: center; gap: 9px; margin-right: auto; }
+    .top-brand-mark { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 9px; background: var(--teal-dark); color: #e8f5ed; font-size: 15px; font-weight: 800; }
+    .top-brand strong { font-size: 13px; letter-spacing: .04em; }
+    .top-brand small { margin-left: 3px; color: var(--muted); font-size: 9px; letter-spacing: .08em; }
     .crumb { color: var(--muted); font-size: 13px; }
     .crumb b { color: var(--ink); font-weight: 600; }
     .top-right { display: flex; gap: 10px; align-items: center; }
@@ -173,8 +178,41 @@
     .toast { position: fixed; z-index: 5; bottom: 24px; left: 50%; max-width: calc(100vw - 30px); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; border-radius: 9px; background: #183833; color: white; padding: 11px 16px; box-shadow: var(--shadow); font-size: 12px; transition: .2s ease; }
     .toast.show { transform: translate(-50%, 0); opacity: 1; }
     .mobile-nav { display: none; }
+    .split-console { margin: 0 0 18px; border: 1px solid #dfe8e2; border-radius: 16px; overflow: hidden; background: #fff; box-shadow: var(--shadow); }
+    .split-console-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+    .split-console-head h2 { margin: 0; font-size: 15px; }
+    .split-console-head p { margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .split-link-state { display: inline-flex; align-items: center; gap: 7px; color: #27694f; font-size: 10px; white-space: nowrap; }
+    .split-link-state .live-dot { background: #e2a53a; box-shadow: 0 0 0 3px #fff3dd; }
+    .split-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: #f9fbf9; }
+    .split-controls-label { margin-right: 4px; color: var(--muted); font-size: 10px; }
+    .split-control { padding: 6px 9px; border: 1px solid #dce6e0; border-radius: 7px; background: #fff; color: #53635c; cursor: pointer; font-size: 10px; }
+    .split-control[aria-pressed="true"] { border-color: #9dc5ad; color: #1d694d; background: #eaf5ee; }
+    .split-control.swap { margin-left: auto; }
+    .split-stage { --company-share: 50%; display: grid; grid-template-columns: minmax(0, var(--company-share)) 12px minmax(0, 1fr); grid-template-areas: "company divider center"; min-height: 350px; }
+    .split-stage[data-layout="vertical"] { grid-template-columns: 1fr; grid-template-rows: auto 12px auto; grid-template-areas: "company" "divider" "center"; }
+    .split-stage[data-reversed="true"] { grid-template-columns: minmax(0, calc(100% - var(--company-share) - 12px)) 12px minmax(0, var(--company-share)); grid-template-areas: "center divider company"; }
+    .split-stage[data-layout="vertical"][data-reversed="true"] { grid-template-areas: "center" "divider" "company"; }
+    .split-pane { min-width: 0; padding: 14px; background: #fff; }
+    .split-pane.company-pane { grid-area: company; }
+    .split-pane.center-pane { grid-area: center; background: #fbfcfa; }
+    .split-pane-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 11px; }
+    .split-pane-head h3 { margin: 0; font-size: 12px; }
+    .split-pane-head span { color: var(--muted); font-size: 9px; }
+    .split-pane-content { display: grid; gap: 10px; }
+    .split-pane-content > .panel { margin: 0 !important; box-shadow: none; border-color: #e6ece8; border-radius: 11px; }
+    .split-divider { grid-area: divider; position: relative; display: grid; place-items: center; background: #edf2ee; cursor: col-resize; }
+    .split-divider:after { content: ""; width: 3px; height: 42px; border-radius: 4px; background: #92ae9d; box-shadow: 0 0 0 3px #dce9df; }
+    .split-stage[data-layout="vertical"] .split-divider { cursor: row-resize; }
+    .split-stage[data-layout="vertical"] .split-divider:after { width: 42px; height: 3px; }
+    .split-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+    .split-summary-item { padding: 9px 10px; border: 1px solid #e6ece8; border-radius: 9px; background: #fff; }
+    .split-summary-item span { display: block; color: var(--muted); font-size: 9px; }
+    .split-summary-item strong { display: block; margin-top: 4px; font-size: 12px; }
+    .split-privacy { margin: 10px 14px 12px; color: var(--muted); font-size: 9px; line-height: 1.55; }
+    .split-stage[data-layout="vertical"] .company-pane,
+    .split-stage[data-layout="vertical"] .center-pane { min-height: 0; }
     @media (max-width: 1060px) {
-      .app { grid-template-columns: 205px 1fr; }
       .content-grid { grid-template-columns: minmax(0, 1.3fr) minmax(250px, .85fr); }
       .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
@@ -183,6 +221,18 @@
       .sidebar { display: none; }
       main { padding: 17px 15px 25px; }
       .topbar { margin-bottom: 20px; }
+      .crumb { display: none; }
+      .topbar { min-height: 48px; }
+      .split-console-head { align-items: flex-start; }
+      .split-link-state { display: none; }
+      .split-stage, .split-stage[data-reversed="true"] { grid-template-columns: 1fr; grid-template-rows: auto 10px auto; grid-template-areas: "company" "divider" "center"; }
+      .split-stage[data-layout="vertical"][data-reversed="true"] { grid-template-areas: "center" "divider" "company"; }
+      .split-divider { cursor: row-resize; }
+      .split-divider:after { width: 42px; height: 3px; }
+      .split-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .split-controls-label { display: none; }
+      .split-control.swap { margin-left: 0; }
+      .split-control[data-split-layout="horizontal"], .split-control[data-company-share] { display: none; }
       .content-grid { grid-template-columns: 1fr; }
       .right-stack { grid-template-columns: 1fr; }
       .shift { display: none; }
@@ -193,6 +243,7 @@
     }
     @media (max-width: 420px) {
       .live-pill { display: none; }
+      .top-brand small { display: none; }
       .heading-row { align-items: start; }
       .metrics { gap: 9px; }
       .metric { padding: 13px; }
@@ -222,6 +273,7 @@
     </aside>
     <main>
       <header class="topbar">
+        <div class="top-brand"><span class="top-brand-mark">安</span><strong>安巡</strong><small>INDUSTRIAL SAFETY</small></div>
         <div class="crumb"><span data-i18n="industrySafety">工业安全</span> <span> / </span> <b data-i18n="onsiteOverview">现场总览</b></div>
         <div class="top-right">
           <div class="language-switch" role="group" aria-label="Language">
@@ -237,6 +289,39 @@
         <div><h1 data-i18n="pageTitle">现场安全总览</h1><p class="subhead" data-i18n="pageSubtitle">连接现场人员、智能穿戴设备与安全监控中心，及时掌握作业状态。</p></div>
         <div class="shift" data-i18n="todayShift">2026年11月18日 · 日班</div>
       </div>
+      <section class="split-console" aria-labelledby="split-title">
+        <div class="split-console-head">
+          <div><h2 id="split-title" data-i18n="splitTitle">企业现场 ↔ 控制中心 · 实时协同视图</h2><p data-i18n="splitDescription">左侧展示现场摄像头与穿戴设备；右侧汇总区域和姿态观察。视频仅在本机处理，不传送到控制中心。</p></div>
+          <span class="split-link-state"><i class="live-dot"></i><span data-i18n="splitDemoState">浏览器演示 · 尚未连接真实中继</span></span>
+        </div>
+        <div class="split-controls" role="group" aria-label="Split-screen controls">
+          <span class="split-controls-label" data-i18n="splitLayoutLabel">画面布局</span>
+          <button class="split-control" type="button" data-split-layout="horizontal" aria-pressed="true" data-i18n="splitHorizontal">左右</button>
+          <button class="split-control" type="button" data-split-layout="vertical" aria-pressed="false" data-i18n="splitVertical">上下</button>
+          <button class="split-control" type="button" data-company-share="38" aria-pressed="false" data-i18n="splitCompanyNarrow">现场窄屏</button>
+          <button class="split-control" type="button" data-company-share="50" aria-pressed="true" data-i18n="splitHalf">各半</button>
+          <button class="split-control" type="button" data-company-share="62" aria-pressed="false" data-i18n="splitCompanyWide">现场宽屏</button>
+          <button class="split-control swap" type="button" id="split-swap" aria-pressed="false" data-i18n="splitSwap">交换画面顺序</button>
+        </div>
+        <div class="split-stage" id="split-stage" data-layout="horizontal" data-reversed="false">
+          <section class="split-pane company-pane" aria-labelledby="company-pane-title">
+            <div class="split-pane-head"><h3 id="company-pane-title" data-i18n="companyPaneTitle">① 企业现场 · 摄像头 + 智能手表</h3><span data-i18n="companyPaneStatus">现场本机</span></div>
+            <div class="split-pane-content" id="company-pane-content"></div>
+          </section>
+          <div class="split-divider" id="split-divider" role="separator" aria-orientation="vertical" aria-label="Adjust split-screen divider" tabindex="0"></div>
+          <section class="split-pane center-pane" aria-labelledby="center-pane-title">
+            <div class="split-pane-head"><h3 id="center-pane-title" data-i18n="centerPaneTitle">② 控制中心 · 区域态势</h3><span data-i18n="centerPaneStatus">汇总视图</span></div>
+            <div class="split-pane-content" id="center-pane-content"></div>
+            <div class="split-summary">
+              <div class="split-summary-item"><span data-i18n="splitDataPose">姿态 / 观察</span><strong data-i18n="splitDataLocal">本机分析</strong></div>
+              <div class="split-summary-item"><span data-i18n="splitDataWearable">穿戴设备</span><strong data-i18n="splitDataDemo">演示数据</strong></div>
+              <div class="split-summary-item"><span data-i18n="splitDataVideo">视频传输</span><strong data-i18n="splitDataNone">未发送</strong></div>
+              <div class="split-summary-item"><span data-i18n="splitDataRelay">实时中继</span><strong data-i18n="splitDataOffline">未连接</strong></div>
+            </div>
+          </section>
+        </div>
+        <p class="split-privacy" data-i18n="splitPrivacy">本机摄像头需要明确授权。姿态估计仅在本机实时运行；演示页面不上传视频、骨架坐标或个人身份信息。控制中心连接需有效授权码及站点配置。</p>
+      </section>
       <section class="metrics" aria-label="现场指标">
         <article class="metric"><div class="metric-top"><span data-i18n="workersOnsite">现场人员</span><div class="metric-icon">♙</div></div><div class="metric-value">24 <span style="font-size:13px;font-weight:450" data-i18n="peopleUnit">人</span></div><div class="metric-foot good"><span data-i18n="normalPeople">● 22 人状态正常</span></div></article>
         <article class="metric"><div class="metric-top"><span data-i18n="watchesOnline">在线手表</span><div class="metric-icon">⌚</div></div><div class="metric-value" id="watch-count">18 <span style="font-size:13px;font-weight:450">/ 24</span></div><div class="metric-foot"><span data-i18n="lastSync">最近同步</span> <span id="sync-time" data-i18n="justNow">刚刚</span></div></article>
@@ -245,7 +330,7 @@
       </section>
       <div class="content-grid">
         <div class="left-stack">
-          <section class="panel">
+          <section class="panel" id="watch-panel">
             <div class="panel-head"><div><h2 data-i18n="watchTitle">智能手表 · 实时状态</h2><p data-i18n="watchSubtitle">穿戴设备数据仅用于现场安全协同</p></div><button class="text-button" id="connect-link" data-i18n="deviceManagement">设备管理 →</button></div>
             <div class="panel-body">
               <div class="watch-status" id="watch-status">
@@ -309,7 +394,7 @@
               <div class="reba-actions"><button class="primary-btn" type="button" id="reba-record" data-i18n="recordObservation">记录本次观察</button></div>
               <div class="reba-records" id="reba-records" aria-live="polite"></div>
               <p class="reba-disclaimer" data-i18n="rebaDisclaimer">这是 REBA 因素观察辅助原型，不是官方 REBA 分数或诊断。计数仅反映所选提示项，不使用 REBA 标准评分表；正式评估应由受训人员按完整 REBA 方法现场观察并复核。摄像头不会自动识别姿势。</p>
-              <div class="center-bridge">
+              <div class="center-bridge" id="center-bridge">
                 <h3 data-i18n="centerBridgeTitle">连接庆云大学控制中心</h3>
                 <p data-i18n="centerBridgeNote">使用控制中心签发的 SK 控制码建立云端实时通道。仅发送人工选择的姿势观察因素与数量；不发送摄像头画面、姓名或手表健康数据。中心暂以原始数据包接收，不写入正式 REBA 报告。</p>
                 <div class="center-bridge-row">
@@ -326,7 +411,7 @@
               </div>
             </div>
           </section>
-          <section class="panel" style="margin-top:15px">
+          <section class="panel" id="camera-panel" style="margin-top:15px">
             <div class="panel-head"><div><h2 data-i18n="cameraTitle">现场摄像头 · 实时监测</h2><p data-i18n="cameraSubtitle">本机浏览器预览与画面变化监测</p></div><span class="state muted" id="camera-state" data-i18n="cameraOff" role="status" aria-live="polite">未启动</span></div>
             <div class="panel-body">
               <div class="camera-frame">
@@ -364,7 +449,7 @@
           </section>
         </div>
         <aside class="right-stack">
-          <section class="panel">
+          <section class="panel" id="site-map-panel">
             <div class="panel-head"><div><h2 data-i18n="workshopArea">车间区域</h2><p data-i18n="locationDisclaimer">人员位置示意 · 非精确定位</p></div><button class="text-button" data-i18n="fullScreen">全屏</button></div>
             <div class="panel-body">
               <div class="zone"><div class="zone-title" data-i18n="siteName">一号生产车间</div><span class="zone-label a" data-i18n="zoneA2">装配区 A2</span><span class="zone-label b" data-i18n="zoneB1">仓储区 B1</span><span class="zone-label c" data-i18n="zoneC3">检修区 C3</span><i class="worker-dot"></i><span class="worker-tag" data-i18n="workerOneTag">李师傅 · 018</span><i class="worker-dot warn"></i></div>
@@ -391,6 +476,7 @@
     const messages = {
       zh: {
         workspace: "工作空间", navOverview: "安全总览", navWearables: "智能穿戴", navPeople: "人员与区域", navEvents: "事件与告警", navPatrols: "巡检记录", management: "管理", deviceSettings: "设备设置",
+        splitTitle: "企业现场 ↔ 控制中心 · 实时协同视图", splitDescription: "左侧展示现场摄像头与穿戴设备；右侧汇总区域和姿态观察。视频仅在本机处理，不传送到控制中心。", splitDemoState: "浏览器演示 · 尚未连接真实中继", splitLayoutLabel: "画面布局", splitHorizontal: "左右", splitVertical: "上下", splitCompanyNarrow: "现场窄屏", splitHalf: "各半", splitCompanyWide: "现场宽屏", splitSwap: "交换画面顺序", companyPaneTitle: "① 企业现场 · 摄像头 + 智能手表", companyPaneStatus: "现场本机", centerPaneTitle: "② 控制中心 · 区域态势", centerPaneStatus: "汇总视图", splitDataPose: "姿态 / 观察", splitDataLocal: "本机分析", splitDataWearable: "穿戴设备", splitDataDemo: "演示数据", splitDataVideo: "视频传输", splitDataNone: "未发送", splitDataRelay: "实时中继", splitDataOffline: "未连接", splitPrivacy: "本机摄像头需要明确授权。姿态估计仅在本机实时运行；演示页面不上传视频、骨架坐标或个人身份信息。控制中心连接需有效授权码及站点配置。",
         siteName: "一号生产车间", shiftHours: "日班 · 08:00–20:00", industrySafety: "工业安全", onsiteOverview: "现场总览", systemRunning: "系统运行中", demoData: "演示数据", pageTitle: "现场安全总览", pageSubtitle: "连接现场人员、智能穿戴设备与安全监控中心，及时掌握作业状态。", todayShift: "2026年11月18日 · 日班",
         workersOnsite: "现场人员", peopleUnit: "人", normalPeople: "● 22 人状态正常", watchesOnline: "在线手表", lastSync: "最近同步", justNow: "刚刚", pendingAlerts: "待处理告警", confirmOnsite: "需现场确认", todayPatrol: "今日巡检", timesUnit: "次", patrolChange: "较昨日 +4 次",
         navReba: "肌骨风险", mobileReba: "肌骨", rebaTitle: "肌肉骨骼健康 · REBA 姿势观察", rebaSubtitle: "基于工作姿势与任务因素的人体工效筛查", screeningOnly: "观察筛查", rebaIntro: "观察一个具有代表性的工作姿势，逐项标记需要关注的部位和任务因素。系统统计提示项，帮助安排人工复核。",
@@ -410,6 +496,7 @@
       },
       en: {
         workspace: "WORKSPACE", navOverview: "Safety overview", navWearables: "Wearables", navPeople: "People & zones", navEvents: "Events & alerts", navPatrols: "Inspection logs", management: "MANAGEMENT", deviceSettings: "Device settings",
+        splitTitle: "Company site ↔ Operations center · Live collaboration", splitDescription: "The left side shows the site camera and wearable; the right summarizes work zones and pose observations. Video stays on this device and is not sent to the center.", splitDemoState: "Browser demo · No live relay connected", splitLayoutLabel: "Layout", splitHorizontal: "Side by side", splitVertical: "Stacked", splitCompanyNarrow: "Narrow site", splitHalf: "Equal", splitCompanyWide: "Wide site", splitSwap: "Swap panels", companyPaneTitle: "① Company site · Camera + smartwatch", companyPaneStatus: "On this device", centerPaneTitle: "② Operations center · Site overview", centerPaneStatus: "Summary view", splitDataPose: "Pose / observation", splitDataLocal: "On-device", splitDataWearable: "Wearable", splitDataDemo: "Demo data", splitDataVideo: "Video transfer", splitDataNone: "Not sent", splitDataRelay: "Live relay", splitDataOffline: "Not connected", splitPrivacy: "Camera access requires your permission. Pose estimation runs locally; this demo does not upload video, skeleton coordinates, or identity data. Connecting to an operations center requires valid credentials and site configuration.",
         siteName: "Production workshop 1", shiftHours: "Day shift · 08:00–20:00", industrySafety: "Industrial safety", onsiteOverview: "Site overview", systemRunning: "System operational", demoData: "Demo data", pageTitle: "Site safety overview", pageSubtitle: "Connect onsite personnel, wearable devices, and the safety operations center to monitor work conditions.", todayShift: "Nov 18, 2026 · Day shift",
         workersOnsite: "Onsite personnel", peopleUnit: "people", normalPeople: "● 22 people in normal status", watchesOnline: "Watches online", lastSync: "Last sync", justNow: "Just now", pendingAlerts: "Pending alerts", confirmOnsite: "Onsite confirmation needed", todayPatrol: "Inspections today", timesUnit: "checks", patrolChange: "+4 vs. yesterday",
         navReba: "Ergonomics", mobileReba: "REBA", rebaTitle: "Musculoskeletal health · REBA posture observation", rebaSubtitle: "Ergonomic screening based on work posture and task factors", screeningOnly: "Screening aid", rebaIntro: "Observe a representative work posture and flag body areas or task factors that may need attention. The checklist counts prompts to help plan a human review.",
@@ -429,6 +516,7 @@
       },
       ko: {
         workspace: "작업 공간", navOverview: "안전 현황", navWearables: "웨어러블", navPeople: "작업자 및 구역", navEvents: "이벤트 및 경보", navPatrols: "점검 기록", management: "관리", deviceSettings: "장비 설정",
+        splitTitle: "기업 현장 ↔ 관제 센터 · 실시간 협업 화면", splitDescription: "왼쪽에는 현장 카메라와 웨어러블을, 오른쪽에는 구역 현황과 자세 관찰 정보를 표시합니다. 영상은 이 기기에서 처리하며 관제센터로 전송하지 않습니다.", splitDemoState: "브라우저 데모 · 실제 중계 미연결", splitLayoutLabel: "화면 배치", splitHorizontal: "좌우", splitVertical: "상하", splitCompanyNarrow: "현장 좁게", splitHalf: "반반", splitCompanyWide: "현장 넓게", splitSwap: "패널 순서 바꾸기", companyPaneTitle: "① 기업 현장 · 카메라 + 스마트워치", companyPaneStatus: "이 기기에서 처리", centerPaneTitle: "② 관제 센터 · 구역 현황", centerPaneStatus: "요약 보기", splitDataPose: "자세 / 관찰", splitDataLocal: "기기 내 분석", splitDataWearable: "웨어러블", splitDataDemo: "데모 데이터", splitDataVideo: "영상 전송", splitDataNone: "전송 안 함", splitDataRelay: "실시간 중계", splitDataOffline: "연결 안 됨", splitPrivacy: "카메라 사용에는 명시적 권한이 필요합니다. 자세 추정은 이 기기에서만 실행합니다. 데모 페이지는 영상, 스켈레톤 좌표 또는 개인 식별 정보를 업로드하지 않습니다. 관제센터 연결에는 유효한 인증 코드와 사이트 설정이 필요합니다.",
         siteName: "제1 생산 작업장", shiftHours: "주간 근무 · 08:00–20:00", industrySafety: "산업 안전", onsiteOverview: "현장 개요", systemRunning: "시스템 정상 운영 중", demoData: "데모 데이터", pageTitle: "현장 안전 개요", pageSubtitle: "현장 작업자, 웨어러블 기기 및 안전 관제 센터를 연결해 작업 상태를 확인합니다.", todayShift: "2026년 11월 18일 · 주간 근무",
         workersOnsite: "현장 작업자", peopleUnit: "명", normalPeople: "● 22명 정상 상태", watchesOnline: "온라인 워치", lastSync: "최근 동기화", justNow: "방금", pendingAlerts: "미처리 경보", confirmOnsite: "현장 확인 필요", todayPatrol: "오늘 점검", timesUnit: "회", patrolChange: "어제보다 +4회",
         navReba: "근골격 평가", mobileReba: "REBA", rebaTitle: "근골격계 건강 · REBA 자세 관찰", rebaSubtitle: "작업 자세와 작업 요인 기반 인간공학 선별", screeningOnly: "관찰 선별", rebaIntro: "대표적인 작업 자세를 관찰하고 주의가 필요한 신체 부위와 작업 요인을 표시하세요. 표시 항목 수는 작업자 검토 계획을 돕기 위한 참고 정보입니다.",
@@ -468,6 +556,71 @@
     let controlError = "";
     let controlScriptPromise = null;
     let controlPacketSequence = 0;
+    const companyPaneContent = document.getElementById("company-pane-content");
+    const centerPaneContent = document.getElementById("center-pane-content");
+    companyPaneContent.append(document.getElementById("watch-panel"), document.getElementById("camera-panel"));
+    centerPaneContent.append(document.getElementById("site-map-panel"), document.getElementById("center-bridge"));
+    const splitStage = document.getElementById("split-stage");
+    const splitDivider = document.getElementById("split-divider");
+    let companyShare = 50;
+
+    function setCompanyShare(value) {
+      companyShare = Math.max(30, Math.min(70, value));
+      splitStage.style.setProperty("--company-share", `${companyShare}%`);
+      document.querySelectorAll("[data-company-share]").forEach(button => {
+        button.setAttribute("aria-pressed", String(Number(button.dataset.companyShare) === companyShare));
+      });
+    }
+
+    document.querySelectorAll("[data-split-layout]").forEach(button => {
+      button.addEventListener("click", () => {
+        if (window.matchMedia("(max-width: 760px)").matches && button.dataset.splitLayout === "horizontal") return;
+        const layout = button.dataset.splitLayout;
+        splitStage.dataset.layout = layout;
+        document.querySelectorAll("[data-split-layout]").forEach(option => {
+          option.setAttribute("aria-pressed", String(option === button));
+        });
+        document.getElementById("split-divider").setAttribute("aria-orientation", layout === "vertical" ? "horizontal" : "vertical");
+      });
+    });
+    function adaptSplitLayoutToViewport() {
+      if (!window.matchMedia("(max-width: 760px)").matches) return;
+      splitStage.dataset.layout = "vertical";
+      document.querySelectorAll("[data-split-layout]").forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.splitLayout === "vertical"));
+      });
+      splitDivider.setAttribute("aria-orientation", "horizontal");
+    }
+    adaptSplitLayoutToViewport();
+    window.addEventListener("resize", adaptSplitLayoutToViewport);
+    document.querySelectorAll("[data-company-share]").forEach(button => {
+      button.addEventListener("click", () => setCompanyShare(Number(button.dataset.companyShare)));
+    });
+    document.getElementById("split-swap").addEventListener("click", event => {
+      const reversed = splitStage.dataset.reversed !== "true";
+      splitStage.dataset.reversed = String(reversed);
+      event.currentTarget.setAttribute("aria-pressed", String(reversed));
+    });
+    document.getElementById("split-divider").addEventListener("keydown", event => {
+      if (splitStage.dataset.layout !== "horizontal" || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+      event.preventDefault();
+      const direction = event.key === "ArrowRight" ? 5 : -5;
+      setCompanyShare(companyShare + (splitStage.dataset.reversed === "true" ? -direction : direction));
+    });
+    let splitDragging = false;
+    splitDivider.addEventListener("pointerdown", event => {
+      if (window.matchMedia("(max-width: 760px)").matches) return;
+      splitDragging = true;
+      splitDivider.setPointerCapture(event.pointerId);
+    });
+    splitDivider.addEventListener("pointermove", event => {
+      if (!splitDragging || splitStage.dataset.layout !== "horizontal") return;
+      const bounds = splitStage.getBoundingClientRect();
+      const position = (event.clientX - bounds.left) / bounds.width * 100;
+      setCompanyShare(splitStage.dataset.reversed === "true" ? 100 - position : position);
+    });
+    splitDivider.addEventListener("pointerup", () => { splitDragging = false; });
+    splitDivider.addEventListener("pointercancel", () => { splitDragging = false; });
 
     function updateControlCenterUI() {
       const text = messages[language];
