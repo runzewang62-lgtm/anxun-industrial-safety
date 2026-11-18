@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a2a">
+  <title>安巡 · 工业安全协同平台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172a29;
+      --muted: #71817e;
+      --line: #e2e9e5;
+      --paper: #f5f7f3;
+      --white: #fff;
+      --teal: #167c70;
+      --teal-dark: #102a2a;
+      --mint: #e7f4ed;
+      --amber: #e6a336;
+      --red: #d65b4a;
+      --shadow: 0 12px 35px rgba(20, 52, 45, .07);
+      font-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); }
+    button { font: inherit; }
+    button:disabled, select:disabled { opacity: .58; cursor: not-allowed; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 238px 1fr; }
+    .sidebar {
+      height: 100vh; position: sticky; top: 0; padding: 26px 16px;
+      display: flex; flex-direction: column; background: var(--teal-dark); color: #edf5f0;
+    }
+    .brand { display: flex; gap: 11px; align-items: center; padding: 0 10px 30px; }
+    .brand-mark { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: #d6f1df; color: var(--teal-dark); font-weight: 900; }
+    .brand strong { display: block; font-size: 15px; letter-spacing: .05em; }
+    .brand small { display: block; color: #a7c3b9; font-size: 11px; margin-top: 3px; }
+    .nav-label { color: #819e94; font-size: 10px; letter-spacing: .12em; padding: 12px 12px 8px; }
+    .nav { display: grid; gap: 5px; }
+    .nav button { border: 0; border-radius: 10px; background: transparent; color: #b7ccc3; text-align: left; padding: 11px 12px; cursor: pointer; }
+    .nav button.active, .nav button:hover { color: white; background: #244541; }
+    .nav .ico { display: inline-block; width: 24px; color: #a8cfc0; }
+    .site-card { margin-top: auto; padding: 14px; border: 1px solid #31534c; border-radius: 13px; font-size: 12px; }
+    .site-card strong { display: block; margin-bottom: 5px; }
+    .site-card span { color: #aac3b9; }
+    main { min-width: 0; padding: 28px clamp(18px, 3.2vw, 48px) 40px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 26px; }
+    .crumb { color: var(--muted); font-size: 13px; }
+    .crumb b { color: var(--ink); font-weight: 600; }
+    .top-right { display: flex; gap: 10px; align-items: center; }
+    .language-switch { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--white); }
+    .language-switch button { padding: 6px 8px; border: 0; border-radius: 7px; color: var(--muted); background: transparent; cursor: pointer; font-size: 10px; }
+    .language-switch button.active { color: white; background: var(--teal); }
+    .live-pill, .demo-pill { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 99px; background: var(--white); font-size: 11px; white-space: nowrap; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #34a877; box-shadow: 0 0 0 3px #dff3e8; }
+    .demo-pill { color: #815911; border-color: #f0dfbd; background: #fff8e9; }
+    h1 { margin: 0; font-size: clamp(24px, 3vw, 34px); letter-spacing: -.04em; }
+    .subhead { margin: 8px 0 24px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .heading-row { display: flex; justify-content: space-between; align-items: end; gap: 14px; }
+    .shift { color: var(--muted); font-size: 12px; padding-bottom: 5px; }
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; margin-bottom: 16px; }
+    .metric { padding: 17px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--white); box-shadow: 0 3px 12px rgba(20,52,45,.02); }
+    .metric-top { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 11px; }
+    .metric-icon { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 9px; background: var(--mint); color: var(--teal); font-size: 14px; }
+    .metric-value { margin-top: 12px; font-size: 28px; letter-spacing: -.04em; font-weight: 650; }
+    .metric-foot { color: var(--muted); font-size: 10px; margin-top: 5px; }
+    .metric-foot.good { color: var(--teal); }
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(285px, .9fr); gap: 15px; align-items: start; }
+    .left-stack, .right-stack, .panel, .table-wrap { min-width: 0; }
+    .panel { border: 1px solid var(--line); border-radius: 15px; background: var(--white); box-shadow: var(--shadow); overflow: hidden; }
+    .panel-head { min-height: 58px; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+    .panel-head h2 { margin: 0; font-size: 14px; }
+    .panel-head p { margin: 4px 0 0; color: var(--muted); font-size: 10px; }
+    .panel-body { padding: 17px 18px; }
+    .text-button { color: var(--teal); background: transparent; border: 0; cursor: pointer; font-size: 11px; }
+    .watch-status { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 11px; background: #f0f8f3; color: #21664e; font-size: 11px; }
+    .watch-status.disconnected { background: #f3f5f3; color: #657571; }
+    .watch-status-left { display: flex; align-items: center; gap: 9px; }
+    .watch-state-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: #39a675; }
+    .disconnected .watch-state-dot { background: #9aa8a3; }
+    .outline-btn, .primary-btn, .ack-btn { border-radius: 8px; padding: 8px 11px; cursor: pointer; font-size: 11px; }
+    .outline-btn { border: 1px solid #cfe0d7; color: #27694f; background: white; }
+    .primary-btn { border: 1px solid var(--teal); color: white; background: var(--teal); }
+    .watch-card { display: grid; grid-template-columns: 148px 1fr; gap: 18px; align-items: center; padding: 20px 10px 17px; }
+    .watch-art { width: 116px; height: 148px; margin: auto; position: relative; display: grid; place-items: center; }
+    .strap { position: absolute; width: 48px; height: 146px; border: 6px solid #324a46; border-radius: 20px; background: #879b93; }
+    .watch-face { position: relative; z-index: 1; width: 96px; height: 115px; padding: 12px 8px; border: 5px solid #243b37; border-radius: 24px; background: #101f1d; box-shadow: 0 9px 18px #253c3633; color: #e5f6ed; text-align: center; }
+    .watch-face small { font-size: 8px; color: #8fb9a4; }
+    .watch-heart { color: #ff7468; font-size: 16px; margin: 9px 0 1px; }
+    .watch-bpm { font-size: 20px; font-weight: 650; }
+    .watch-caption { color: #c3d6cc; font-size: 8px; margin-top: 5px; }
+    .readings { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .reading { padding: 10px 11px; background: #f7f9f7; border-radius: 10px; }
+    .reading span { display: block; color: var(--muted); font-size: 10px; }
+    .reading strong { display: block; margin-top: 5px; font-size: 17px; font-weight: 650; }
+    .reading em { font-size: 9px; font-style: normal; color: var(--muted); margin-left: 3px; }
+    .watch-note { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .camera-frame { position: relative; min-height: 220px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 11px; background: #102a2a; }
+    .camera-frame video { width: 100%; height: 100%; position: absolute; inset: 0; object-fit: cover; }
+    .camera-placeholder { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 9px; color: #b7ccc3; text-align: center; font-size: 12px; }
+    .camera-placeholder .camera-icon { color: #73ad94; font-size: 30px; }
+    .camera-overlay { position: absolute; top: 10px; left: 10px; display: flex; align-items: center; gap: 7px; padding: 6px 9px; border-radius: 99px; background: #102a2ad9; color: white; font-size: 10px; }
+    .camera-overlay .live-dot { background: #e05e50; box-shadow: 0 0 0 3px #e05e5040; }
+    .camera-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
+    .camera-controls select { min-width: 150px; flex: 1; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: white; color: var(--ink); font: inherit; font-size: 11px; }
+    .camera-monitor { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; padding: 10px 12px; border-radius: 9px; background: #f5f8f6; color: var(--muted); font-size: 10px; }
+    .camera-monitor strong { color: var(--ink); font-size: 11px; font-weight: 600; }
+    .camera-note { margin: 10px 0 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .reba-intro { margin: 0 0 15px; color: var(--muted); font-size: 11px; line-height: 1.65; }
+    .reba-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .reba-group { padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #fcfdfb; }
+    .reba-group h3 { margin: 0 0 11px; font-size: 12px; }
+    .reba-fields { display: grid; gap: 10px; }
+    .reba-field { display: grid; gap: 5px; }
+    .reba-field label { color: var(--muted); font-size: 10px; }
+    .reba-field select, .reba-task select { width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; background: white; color: var(--ink); font: inherit; font-size: 11px; }
+    .reba-task { display: flex; justify-content: flex-end; gap: 10px; align-items: end; margin-top: 12px; }
+    .task-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 0; }
+    .reba-summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 13px; padding: 12px; border-radius: 10px; background: #f0f8f3; }
+    .reba-summary span { display: block; color: var(--muted); font-size: 10px; }
+    .reba-summary strong { display: block; margin-top: 4px; font-size: 14px; }
+    .reba-count { flex: none; text-align: right; color: var(--teal); font-weight: 700; font-size: 21px; }
+    .reba-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .reba-records { display: grid; gap: 7px; margin-top: 13px; }
+    .reba-record { display: flex; justify-content: space-between; gap: 8px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 10px; }
+    .reba-record span:last-child { color: var(--muted); text-align: right; }
+    .reba-disclaimer { margin: 12px 0 0; color: var(--muted); font-size: 10px; line-height: 1.65; }
+    .center-bridge { margin-top: 14px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #f9fbf9; }
+    .center-bridge h3 { margin: 0; font-size: 12px; }
+    .center-bridge > p { margin: 6px 0 10px; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .center-bridge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .center-bridge input { min-width: 180px; flex: 1; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; background: white; color: var(--ink); font: inherit; font-size: 11px; }
+    .center-bridge-status { display: block; min-height: 16px; margin-top: 9px; color: var(--muted); font-size: 10px; }
+    .center-bridge-status.connected { color: var(--teal); }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; min-width: 510px; text-align: left; }
+    th { padding: 10px 18px; background: #fafbf9; color: var(--muted); font-size: 10px; font-weight: 500; }
+    td { padding: 12px 18px; border-top: 1px solid #eff2ef; font-size: 11px; }
+    .person { display: flex; align-items: center; gap: 9px; }
+    .avatar { width: 27px; height: 27px; border-radius: 50%; display: grid; place-items: center; background: #e3eee8; color: #316a55; font-size: 10px; }
+    .person small { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .state { display: inline-flex; align-items: center; gap: 5px; border-radius: 99px; padding: 5px 8px; background: #edf6ef; color: #377454; font-size: 9px; white-space: nowrap; }
+    .state:before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .state.warn { color: #a46b11; background: #fff5e3; }
+    .state.muted { color: #788681; background: #f0f3f1; }
+    .right-stack { display: grid; gap: 15px; }
+    .zone { position: relative; min-height: 177px; border-radius: 11px; overflow: hidden; background-color: #edf2eb; background-image: linear-gradient(90deg, transparent 49%, #ffffff99 50%, transparent 51%), linear-gradient(transparent 49%, #ffffff99 50%, transparent 51%); background-size: 40px 40px; }
+    .zone-title { position: absolute; top: 12px; left: 13px; color: #72817a; font-size: 10px; }
+    .zone-label { position: absolute; padding: 6px 8px; border-radius: 7px; background: #ffffffd9; color: #52635b; font-size: 9px; box-shadow: 0 3px 9px #29423615; }
+    .zone-label.a { left: 11%; top: 36%; }
+    .zone-label.b { right: 9%; top: 58%; }
+    .zone-label.c { left: 43%; top: 72%; }
+    .worker-dot { position: absolute; width: 13px; height: 13px; border: 3px solid white; border-radius: 50%; background: #29a37b; box-shadow: 0 0 0 5px #29a37b30; left: 52%; top: 45%; }
+    .worker-dot.warn { left: 72%; top: 58%; background: var(--amber); box-shadow: 0 0 0 5px #e6a33630; }
+    .worker-tag { position: absolute; top: 24px; left: 48%; padding: 4px 7px; border-radius: 6px; background: #fff; font-size: 9px; }
+    .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; color: var(--muted); font-size: 9px; }
+    .legend i { width: 7px; height: 7px; display: inline-block; border-radius: 50%; margin-right: 5px; background: #29a37b; }
+    .legend .amber { background: var(--amber); }
+    .event { display: grid; grid-template-columns: 30px 1fr auto; gap: 9px; padding: 12px 0; border-bottom: 1px solid #eff2ef; align-items: start; }
+    .event:last-child { padding-bottom: 2px; border-bottom: 0; }
+    .event-icon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 9px; color: #9a6d21; background: #fff4df; }
+    .event strong { display: block; font-size: 10px; font-weight: 600; }
+    .event p { margin: 4px 0 0; color: var(--muted); font-size: 9px; line-height: 1.5; }
+    .event time { color: #9aa6a1; font-size: 9px; white-space: nowrap; }
+    .ack-btn { margin-top: 7px; border: 1px solid #eed9b7; color: #8a641f; background: #fffaf0; padding: 5px 8px; font-size: 9px; }
+    .event.acknowledged .event-icon { background: #e9f4ed; color: #367451; }
+    .event.acknowledged .ack-btn { display: none; }
+    .bottom-note { margin-top: 18px; color: #899691; font-size: 10px; text-align: center; line-height: 1.6; }
+    .toast { position: fixed; z-index: 5; bottom: 24px; left: 50%; max-width: calc(100vw - 30px); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; border-radius: 9px; background: #183833; color: white; padding: 11px 16px; box-shadow: var(--shadow); font-size: 12px; transition: .2s ease; }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+    .mobile-nav { display: none; }
+    @media (max-width: 1060px) {
+      .app { grid-template-columns: 205px 1fr; }
+      .content-grid { grid-template-columns: minmax(0, 1.3fr) minmax(250px, .85fr); }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 760px) {
+      .app { display: block; padding-bottom: 70px; }
+      .sidebar { display: none; }
+      main { padding: 17px 15px 25px; }
+      .topbar { margin-bottom: 20px; }
+      .content-grid { grid-template-columns: 1fr; }
+      .right-stack { grid-template-columns: 1fr; }
+      .shift { display: none; }
+      .mobile-nav { display: flex; position: fixed; z-index: 4; left: 0; right: 0; bottom: 0; justify-content: space-around; padding: 8px 3px max(8px, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: #ffffffed; backdrop-filter: blur(12px); }
+      .mobile-nav button { border: 0; background: none; color: #788681; font-size: 9px; min-width: 55px; padding: 4px; cursor: pointer; }
+      .mobile-nav button span { display: block; color: var(--teal); font-size: 17px; margin-bottom: 3px; }
+      .reba-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 420px) {
+      .live-pill { display: none; }
+      .heading-row { align-items: start; }
+      .metrics { gap: 9px; }
+      .metric { padding: 13px; }
+      .metric-value { font-size: 24px; }
+      .watch-card { grid-template-columns: 104px 1fr; gap: 10px; padding-left: 0; padding-right: 0; }
+      .watch-art { transform: scale(.85); transform-origin: center; }
+      .panel-body { padding: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">安</div><div><strong>安巡 · SAFETY</strong><small>INDUSTRIAL SAFETY PLATFORM</small></div></div>
+      <div class="nav-label" data-i18n="workspace">工作空间</div>
+      <nav class="nav" aria-label="主导航">
+        <button class="active" data-nav="overview"><span class="ico">◫</span><span data-i18n="navOverview">安全总览</span></button>
+        <button data-nav="wearables"><span class="ico">⌚</span><span data-i18n="navWearables">智能穿戴</span></button>
+        <button data-nav="people"><span class="ico">⌖</span><span data-i18n="navPeople">人员与区域</span></button>
+        <button data-nav="reba"><span class="ico">♧</span><span data-i18n="navReba">肌骨评估</span></button>
+        <button data-nav="events"><span class="ico">⚑</span><span data-i18n="navEvents">事件与告警</span></button>
+        <button data-nav="patrols"><span class="ico">▤</span><span data-i18n="navPatrols">巡检记录</span></button>
+      </nav>
+      <div class="nav-label" data-i18n="management">管理</div>
+      <nav class="nav"><button data-nav="settings"><span class="ico">⚙</span><span data-i18n="deviceSettings">设备设置</span></button></nav>
+      <div class="site-card"><strong data-i18n="siteName">一号生产车间</strong><span data-i18n="shiftHours">日班 · 08:00–20:00</span></div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <div class="crumb"><span data-i18n="industrySafety">工业安全</span> <span> / </span> <b data-i18n="onsiteOverview">现场总览</b></div>
+        <div class="top-right">
+          <div class="language-switch" role="group" aria-label="Language">
+            <button type="button" class="active" data-lang="zh">中文</button>
+            <button type="button" data-lang="en">EN</button>
+            <button type="button" data-lang="ko">한국어</button>
+          </div>
+          <div class="live-pill"><i class="live-dot"></i><span data-i18n="systemRunning">系统运行中</span></div>
+          <div class="demo-pill" data-i18n="demoData">演示数据</div>
+        </div>
+      </header>
+      <div class="heading-row">
+        <div><h1 data-i18n="pageTitle">现场安全总览</h1><p class="subhead" data-i18n="pageSubtitle">连接现场人员、智能穿戴设备与安全监控中心，及时掌握作业状态。</p></div>
+        <div class="shift" data-i18n="todayShift">2026年11月18日 · 日班</div>
+      </div>
+      <section class="metrics" aria-label="现场指标">
+        <article class="metric"><div class="metric-top"><span data-i18n="workersOnsite">现场人员</span><div class="metric-icon">♙</div></div><div class="metric-value">24 <span style="font-size:13px;font-weight:450" data-i18n="peopleUnit">人</span></div><div class="metric-foot good"><span data-i18n="normalPeople">● 22 人状态正常</span></div></article>
+        <article class="metric"><div class="metric-top"><span data-i18n="watchesOnline">在线手表</span><div class="metric-icon">⌚</div></div><div class="metric-value" id="watch-count">18 <span style="font-size:13px;font-weight:450">/ 24</span></div><div class="metric-foot"><span data-i18n="lastSync">最近同步</span> <span id="sync-time" data-i18n="justNow">刚刚</span></div></article>
+        <article class="metric"><div class="metric-top"><span data-i18n="pendingAlerts">待处理告警</span><div class="metric-icon" style="background:#fff3df;color:#a8751d">⚑</div></div><div class="metric-value" id="alert-count">02</div><div class="metric-foot" data-i18n="confirmOnsite">需现场确认</div></article>
+        <article class="metric"><div class="metric-top"><span data-i18n="todayPatrol">今日巡检</span><div class="metric-icon">✓</div></div><div class="metric-value">36 <span style="font-size:13px;font-weight:450" data-i18n="timesUnit">次</span></div><div class="metric-foot good" data-i18n="patrolChange">较昨日 +4 次</div></article>
+      </section>
+      <div class="content-grid">
+        <div class="left-stack">
+          <section class="panel">
+            <div class="panel-head"><div><h2 data-i18n="watchTitle">智能手表 · 实时状态</h2><p data-i18n="watchSubtitle">穿戴设备数据仅用于现场安全协同</p></div><button class="text-button" id="connect-link" data-i18n="deviceManagement">设备管理 →</button></div>
+            <div class="panel-body">
+              <div class="watch-status" id="watch-status">
+                <div class="watch-status-left"><i class="watch-state-dot"></i><span id="connection-text"></span></div>
+                <button class="outline-btn" id="connect-btn"></button>
+              </div>
+              <div class="watch-card">
+                <div class="watch-art" aria-label="智能手表示意图">
+                  <div class="strap"></div>
+                  <div class="watch-face"><small>WORKER 018</small><div class="watch-heart">♥</div><div class="watch-bpm" id="watch-bpm">78</div><small>BPM</small><div class="watch-caption" data-i18n="safeState">安全状态正常</div></div>
+                </div>
+                <div>
+                  <div class="readings">
+                    <div class="reading"><span data-i18n="heartRate">心率</span><strong id="heart-rate">78<em data-i18n="bpm">bpm</em></strong></div>
+                    <div class="reading"><span data-i18n="bodyTemperature">体表温度</span><strong id="temperature">36.4<em>°C</em></strong></div>
+                    <div class="reading"><span data-i18n="oxygenSaturation">血氧饱和度</span><strong id="oxygen">98<em>%</em></strong></div>
+                    <div class="reading"><span data-i18n="batteryLevel">电池电量</span><strong id="battery">86<em>%</em></strong></div>
+                  </div>
+                </div>
+              </div>
+              <p class="watch-note" data-i18n="watchDisclaimer">当前为前端演示数据，不代表真实测量值。实际设备连接需按手表型号配置蓝牙/厂商 SDK，并由服务端接收与鉴权。</p>
+            </div>
+          </section>
+          <section class="panel" id="reba-module" style="margin-top:15px">
+            <div class="panel-head"><div><h2 data-i18n="rebaTitle">肌肉骨骼健康 · REBA 姿势观察</h2><p data-i18n="rebaSubtitle">基于工作姿势与任务因素的人体工效筛查</p></div><span class="state muted" data-i18n="screeningOnly">观察筛查</span></div>
+            <div class="panel-body">
+              <p class="reba-intro" data-i18n="rebaIntro">观察一个具有代表性的工作姿势，逐项标记需要关注的部位和任务因素。系统统计提示项，帮助安排人工复核。</p>
+              <div class="reba-grid">
+                <section class="reba-group">
+                  <h3 data-i18n="groupUpperBody">颈部、躯干与腿部</h3>
+                  <div class="reba-fields">
+                    <div class="reba-field"><label for="reba-neck" data-i18n="neckLabel">颈部姿势</label><select id="reba-neck" data-reba-factor><option value="0" data-i18n="postureNeutral">自然 / 中立</option><option value="1" data-i18n="postureCaution">轻度偏离</option><option value="2" data-i18n="postureConcern">明显弯曲、扭转或不稳</option></select></div>
+                    <div class="reba-field"><label for="reba-trunk" data-i18n="trunkLabel">躯干姿势</label><select id="reba-trunk" data-reba-factor><option value="0" data-i18n="postureNeutral">自然 / 中立</option><option value="1" data-i18n="postureCaution">轻度偏离</option><option value="2" data-i18n="postureConcern">明显弯曲、扭转或不稳</option></select></div>
+                    <div class="reba-field"><label for="reba-legs" data-i18n="legsLabel">腿部与支撑</label><select id="reba-legs" data-reba-factor><option value="0" data-i18n="postureNeutral">自然 / 中立</option><option value="1" data-i18n="postureCaution">轻度偏离</option><option value="2" data-i18n="postureConcern">明显弯曲、扭转或不稳</option></select></div>
+                  </div>
+                </section>
+                <section class="reba-group">
+                  <h3 data-i18n="groupUpperLimbs">上臂、前臂与手腕</h3>
+                  <div class="reba-fields">
+                    <div class="reba-field"><label for="reba-upper-arm" data-i18n="upperArmLabel">上臂姿势</label><select id="reba-upper-arm" data-reba-factor><option value="0" data-i18n="postureNeutral">自然 / 中立</option><option value="1" data-i18n="postureCaution">轻度偏离</option><option value="2" data-i18n="postureConcern">明显抬高、伸展或扭转</option></select></div>
+                    <div class="reba-field"><label for="reba-lower-arm" data-i18n="lowerArmLabel">前臂姿势</label><select id="reba-lower-arm" data-reba-factor><option value="0" data-i18n="postureNeutral">自然 / 中立</option><option value="1" data-i18n="postureCaution">轻度偏离</option><option value="2" data-i18n="postureConcern">明显偏离舒适范围</option></select></div>
+                    <div class="reba-field"><label for="reba-wrist" data-i18n="wristLabel">手腕姿势</label><select id="reba-wrist" data-reba-factor><option value="0" data-i18n="postureNeutral">自然 / 中立</option><option value="1" data-i18n="postureCaution">轻度偏离</option><option value="2" data-i18n="postureConcern">明显弯曲或偏转</option></select></div>
+                  </div>
+                </section>
+              </div>
+              <section class="reba-group" style="margin-top:12px">
+                <h3 data-i18n="groupTaskFactors">负荷、抓握与活动模式</h3>
+                <div class="reba-grid task-grid">
+                  <div class="reba-field"><label for="reba-load" data-i18n="loadLabel">负荷 / 用力</label><select id="reba-load" data-reba-factor><option value="0" data-i18n="loadLow">轻负荷 / 用力较小</option><option value="1" data-i18n="loadModerate">中等负荷 / 需明显用力</option><option value="2" data-i18n="loadHigh">重负荷 / 快速或冲击用力</option></select></div>
+                  <div class="reba-field"><label for="reba-coupling" data-i18n="couplingLabel">抓握 / 握持质量</label><select id="reba-coupling" data-reba-factor><option value="0" data-i18n="couplingGood">抓握稳定、易于控制</option><option value="1" data-i18n="couplingFair">抓握一般或需调整</option><option value="2" data-i18n="couplingPoor">难以抓稳或控制</option></select></div>
+                  <div class="reba-field"><label for="reba-activity" data-i18n="activityLabel">活动模式</label><select id="reba-activity" data-reba-factor><option value="0" data-i18n="activityLow">无明显重复或持续静态姿势</option><option value="1" data-i18n="activitySome">重复动作或持续静态姿势</option><option value="2" data-i18n="activityHigh">高频重复、长时间静态或突发大幅动作</option></select></div>
+                </div>
+              </section>
+              <div class="reba-task">
+                <button class="outline-btn" type="button" id="reba-reset" data-i18n="resetAssessment">重置</button>
+              </div>
+              <div class="reba-summary" role="status" aria-live="polite">
+                <div><span data-i18n="observationResult">人工观察提示</span><strong id="reba-result"></strong></div>
+                <div><span data-i18n="flaggedFactors">需关注部位 / 因素</span><div class="reba-count" id="reba-count">0 / 9</div></div>
+              </div>
+              <div class="reba-actions"><button class="primary-btn" type="button" id="reba-record" data-i18n="recordObservation">记录本次观察</button></div>
+              <div class="reba-records" id="reba-records" aria-live="polite"></div>
+              <p class="reba-disclaimer" data-i18n="rebaDisclaimer">这是 REBA 因素观察辅助原型，不是官方 REBA 分数或诊断。计数仅反映所选提示项，不使用 REBA 标准评分表；正式评估应由受训人员按完整 REBA 方法现场观察并复核。摄像头不会自动识别姿势。</p>
+              <div class="center-bridge">
+                <h3 data-i18n="centerBridgeTitle">连接庆云大学控制中心</h3>
+                <p data-i18n="centerBridgeNote">使用控制中心签发的 SK 控制码建立云端实时通道。仅发送人工选择的姿势观察因素与数量；不发送摄像头画面、姓名或手表健康数据。中心暂以原始数据包接收，不写入正式 REBA 报告。</p>
+                <div class="center-bridge-row">
+                  <input id="center-code" type="password" autocomplete="off" spellcheck="false" placeholder="SK-XXXX-XXXX-XXXX-XXXX" aria-label="Control center access code">
+                  <button class="outline-btn" type="button" id="center-connect" data-i18n="centerConnect">连接控制中心</button>
+                  <button class="outline-btn" type="button" id="center-disconnect" data-i18n="centerDisconnect" hidden>断开</button>
+                </div>
+                <div class="center-bridge-row">
+                  <input id="center-site" type="text" list="center-sites" autocomplete="off" spellcheck="false" placeholder="例如：KWANGSUNG-01" aria-label="Control center site code" disabled>
+                  <datalist id="center-sites"></datalist>
+                  <button class="primary-btn" type="button" id="center-send" data-i18n="centerSend" disabled>发送观察至中心</button>
+                </div>
+                <span class="center-bridge-status" id="center-status" role="status" aria-live="polite" data-i18n="centerDisconnected">尚未连接 · 控制码仅在当前浏览器会话临时使用</span>
+              </div>
+            </div>
+          </section>
+          <section class="panel" style="margin-top:15px">
+            <div class="panel-head"><div><h2 data-i18n="cameraTitle">现场摄像头 · 实时监测</h2><p data-i18n="cameraSubtitle">本机浏览器预览与画面变化监测</p></div><span class="state muted" id="camera-state" data-i18n="cameraOff" role="status" aria-live="polite">未启动</span></div>
+            <div class="panel-body">
+              <div class="camera-frame">
+                <video id="camera-video" autoplay muted playsinline aria-label="现场摄像头实时预览"></video>
+                <div class="camera-placeholder" id="camera-placeholder"><span class="camera-icon">▣</span><span data-i18n="cameraPlaceholder">启动后在此显示摄像头画面</span></div>
+                <div class="camera-overlay" id="camera-overlay" hidden><i class="live-dot"></i><span data-i18n="cameraLive">实时画面</span></div>
+              </div>
+              <div class="camera-controls">
+                <select id="camera-select" aria-label="Camera device" disabled><option data-i18n="cameraSelectDefault">默认摄像头</option></select>
+                <button class="primary-btn" id="camera-start" type="button" data-i18n="cameraStart">启动摄像头</button>
+                <button class="outline-btn" id="camera-stop" type="button" data-i18n="cameraStop" disabled>停止</button>
+              </div>
+              <div class="camera-monitor"><span data-i18n="motionLevelLabel">画面变化（本机分析）</span><strong id="motion-level">—</strong></div>
+              <p class="camera-note" data-i18n="cameraDisclaimer">须由你授权浏览器访问摄像头。视频仅在本机显示；变化检测在本机完成，不录制、不上传，也不识别人脸或判断人员安全。</p>
+            </div>
+          </section>
+          <section class="panel" style="margin-top:15px">
+            <div class="panel-head"><div><h2 data-i18n="peopleTitle">现场人员</h2><p data-i18n="peopleSubtitle">人员定位与穿戴设备状态</p></div><button class="text-button" data-i18n="viewAll">查看全部 →</button></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th data-i18n="tablePerson">人员</th><th data-i18n="tableZone">作业区域</th><th data-i18n="tableDevice">设备状态</th><th data-i18n="tableSafety">安全状态</th></tr></thead>
+                <tbody>
+                  <tr><td><div class="person"><div class="avatar" data-i18n="avatarOne">李</div><div><span data-i18n="workerOne">李师傅</span><small data-i18n="worker018">工号 018</small></div></div></td><td data-i18n="zoneA2">装配区 A2</td><td><span class="state" data-i18n="watchOnline">手表在线</span></td><td><span class="state" data-i18n="normal">正常</span></td></tr>
+                  <tr><td><div class="person"><div class="avatar" data-i18n="avatarTwo">王</div><div><span data-i18n="workerTwo">王工</span><small data-i18n="worker023">工号 023</small></div></div></td><td data-i18n="zoneB1">仓储区 B1</td><td><span class="state" data-i18n="watchOnline">手表在线</span></td><td><span class="state warn" data-i18n="needsConfirmation">需确认</span></td></tr>
+                  <tr><td><div class="person"><div class="avatar" data-i18n="avatarThree">陈</div><div><span data-i18n="workerThree">陈师傅</span><small data-i18n="worker011">工号 011</small></div></div></td><td data-i18n="zoneC3">检修区 C3</td><td><span class="state muted" data-i18n="weakSignal">信号较弱</span></td><td><span class="state" data-i18n="normal">正常</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <aside class="right-stack">
+          <section class="panel">
+            <div class="panel-head"><div><h2 data-i18n="workshopArea">车间区域</h2><p data-i18n="locationDisclaimer">人员位置示意 · 非精确定位</p></div><button class="text-button" data-i18n="fullScreen">全屏</button></div>
+            <div class="panel-body">
+              <div class="zone"><div class="zone-title" data-i18n="siteName">一号生产车间</div><span class="zone-label a" data-i18n="zoneA2">装配区 A2</span><span class="zone-label b" data-i18n="zoneB1">仓储区 B1</span><span class="zone-label c" data-i18n="zoneC3">检修区 C3</span><i class="worker-dot"></i><span class="worker-tag" data-i18n="workerOneTag">李师傅 · 018</span><i class="worker-dot warn"></i></div>
+              <div class="legend"><span><i></i><span data-i18n="normal">状态正常</span></span><span><i class="amber"></i><span data-i18n="awaitingConfirmation">待现场确认</span></span></div>
+            </div>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><div><h2 data-i18n="safetyEvents">安全事件</h2><p data-i18n="eventsSubtitle">现场与穿戴设备事件</p></div><button class="text-button" data-i18n="eventRecords">事件记录 →</button></div>
+            <div class="panel-body" style="padding-top:4px;padding-bottom:14px">
+              <div class="event" id="event-one"><div class="event-icon">⚑</div><div><strong data-i18n="eventHeartTitle">王工 · 心率异常提醒</strong><p data-i18n="eventHeartBody">仓储区 B1 · 请联系现场人员核实</p><button class="ack-btn" data-i18n="acknowledge">确认已处理</button></div><time>10:42</time></div>
+              <div class="event" id="event-two"><div class="event-icon" style="background:#eef4f7;color:#557687">⌚</div><div><strong data-i18n="eventSignalTitle">设备 · 信号短暂中断</strong><p data-i18n="eventSignalBody">检修区 C3 · 等待设备重新同步</p><button class="ack-btn" data-i18n="acknowledge">确认已处理</button></div><time>10:31</time></div>
+            </div>
+          </section>
+        </aside>
+      </div>
+      <div class="bottom-note" data-i18n="prototypeDisclaimer">演示原型 · 实际告警阈值、定位精度、设备通信方式及数据权限须依据设备手册和现场方案配置</div>
+    </main>
+  </div>
+  <nav class="mobile-nav" aria-label="移动端导航">
+    <button class="active" data-nav="overview"><span>◫</span><span data-i18n="mobileOverview">总览</span></button><button data-nav="wearables"><span>⌚</span><span data-i18n="mobileWearables">穿戴</span></button><button data-nav="reba"><span>♧</span><span data-i18n="mobileReba">肌骨</span></button><button data-nav="events"><span>⚑</span><span data-i18n="mobileEvents">事件</span></button><button data-nav="more"><span>☰</span><span data-i18n="mobileMore">更多</span></button>
+  </nav>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    const messages = {
+      zh: {
+        workspace: "工作空间", navOverview: "安全总览", navWearables: "智能穿戴", navPeople: "人员与区域", navEvents: "事件与告警", navPatrols: "巡检记录", management: "管理", deviceSettings: "设备设置",
+        siteName: "一号生产车间", shiftHours: "日班 · 08:00–20:00", industrySafety: "工业安全", onsiteOverview: "现场总览", systemRunning: "系统运行中", demoData: "演示数据", pageTitle: "现场安全总览", pageSubtitle: "连接现场人员、智能穿戴设备与安全监控中心，及时掌握作业状态。", todayShift: "2026年11月18日 · 日班",
+        workersOnsite: "现场人员", peopleUnit: "人", normalPeople: "● 22 人状态正常", watchesOnline: "在线手表", lastSync: "最近同步", justNow: "刚刚", pendingAlerts: "待处理告警", confirmOnsite: "需现场确认", todayPatrol: "今日巡检", timesUnit: "次", patrolChange: "较昨日 +4 次",
+        navReba: "肌骨风险", mobileReba: "肌骨", rebaTitle: "肌肉骨骼健康 · REBA 姿势观察", rebaSubtitle: "基于工作姿势与任务因素的人体工效筛查", screeningOnly: "观察筛查", rebaIntro: "观察一个具有代表性的工作姿势，逐项标记需要关注的部位和任务因素。系统统计提示项，帮助安排人工复核。",
+        groupUpperBody: "颈部、躯干与腿部", groupUpperLimbs: "上臂、前臂与手腕", groupTaskFactors: "负荷、抓握与活动模式", neckLabel: "颈部姿势", trunkLabel: "躯干姿势", legsLabel: "腿部与支撑", upperArmLabel: "上臂姿势", lowerArmLabel: "前臂姿势", wristLabel: "手腕姿势", loadLabel: "负荷 / 用力", couplingLabel: "抓握 / 握持质量", activityLabel: "活动模式",
+        postureNeutral: "自然 / 中立", postureCaution: "轻度偏离", postureConcern: "明显偏离 / 扭转 / 不稳", loadLow: "轻负荷 / 用力较小", loadModerate: "中等负荷 / 需明显用力", loadHigh: "重负荷 / 快速或冲击用力", couplingGood: "抓握稳定、易于控制", couplingFair: "抓握一般或需调整", couplingPoor: "难以抓稳或控制", activityLow: "无明显重复或持续静态姿势", activitySome: "重复动作或持续静态姿势", activityHigh: "高频重复、长时间静态或突发大幅动作",
+        resetAssessment: "重置", observationResult: "观察提示（非 REBA 评分）", flaggedFactors: "需关注部位 / 因素", resultNoFlags: "未标记姿势提示", resultReview: "建议主管复核观察项", resultPriority: "建议优先开展人体工效复核", recordObservation: "记录本次观察", recordEmpty: "暂无观察记录", recordLabel: "本次观察", rebaDisclaimer: "这是 REBA 因素观察辅助原型，不是官方 REBA 分数或诊断。计数仅反映所选提示项，不使用 REBA 标准评分表；正式评估应由受训人员按完整 REBA 方法现场观察并复核。摄像头不会自动识别姿势。",
+        centerBridgeTitle: "连接庆云大学控制中心", centerBridgeNote: "使用控制中心签发的 SK 控制码建立云端实时通道；控制中心页面也须使用同一代码连接。仅发送人工选择的姿势观察因素与数量；不发送摄像头画面、姓名或手表健康数据。中心暂以原始数据包接收，不写入正式 REBA 报告。控制码只在当前会话临时使用，断开后清除。", centerConnect: "连接控制中心", centerDisconnect: "断开", centerSend: "发送观察至中心", centerDisconnected: "尚未连接 · 控制码仅在当前浏览器会话临时使用", centerConnecting: "正在连接安全中继…", centerConnected: "实时通道已连接 · 选择中心站点后可发送", centerConnectionError: "连接失败：{error}", centerScriptError: "无法加载控制中心连接组件，请检查网络后重试。", centerCodeRequired: "请输入控制中心签发的 SK 控制码。", centerSiteRequired: "请输入控制中心中的站点代码。", centerNoSiteList: "连接成功；未找到可选站点，请手动输入站点代码。", centerSendReady: "将发送当前观察项；不包含视频、姓名或手表数据。", centerSendError: "发送失败：连接已断开或数据格式无效。", centerSent: "观察数据已广播；请在控制中心“受信数据量 / 原始 JSON”确认接收。", centerSiteAria: "控制中心站点代码", centerCodeAria: "控制中心访问代码",
+        watchTitle: "智能手表 · 实时状态", watchSubtitle: "穿戴设备数据仅用于现场安全协同", deviceManagement: "设备管理 →", safeState: "安全状态正常", heartRate: "心率", bpm: "bpm", bodyTemperature: "体表温度", oxygenSaturation: "血氧饱和度", batteryLevel: "电池电量",
+        watchDisclaimer: "当前为前端演示数据，不代表真实测量值。实际设备连接需按手表型号配置蓝牙/厂商 SDK，并由服务端接收与鉴权。", cameraTitle: "现场摄像头 · 实时监测", cameraSubtitle: "本机浏览器预览与画面变化监测", cameraOff: "未启动", cameraPlaceholder: "启动后在此显示摄像头画面", cameraLive: "实时画面", cameraSelectDefault: "默认摄像头", cameraStart: "启动摄像头", cameraStop: "停止", motionLevelLabel: "画面变化（本机分析）", cameraDisclaimer: "须由你授权浏览器访问摄像头。视频仅在本机显示；变化检测在本机完成，不录制、不上传，也不识别人脸或判断人员安全。", cameraRequesting: "正在连接", cameraPermissionError: "摄像头权限被拒绝，请在浏览器设置中允许访问。", cameraMissingError: "未找到可用摄像头。", cameraUnavailableError: "摄像头正被其他应用占用或无法启动。", cameraSecureError: "摄像头需在 HTTPS 或 localhost 页面中访问。", cameraGenericError: "无法启动摄像头，请检查设备和浏览器权限。", noCamera: "—", motionWaiting: "正在分析画面…", motionQuiet: "画面稳定", motionDetected: "检测到画面变化 · {percent}%",
+        peopleTitle: "现场人员", peopleSubtitle: "人员定位与穿戴设备状态", viewAll: "查看全部 →", tablePerson: "人员", tableZone: "作业区域", tableDevice: "设备状态", tableSafety: "安全状态",
+        workerOne: "李师傅", workerTwo: "王工", workerThree: "陈师傅", worker018: "工号 018", worker023: "工号 023", worker011: "工号 011", avatarOne: "李", avatarTwo: "王", avatarThree: "陈",
+        zoneA2: "装配区 A2", zoneB1: "仓储区 B1", zoneC3: "检修区 C3", watchOnline: "手表在线", normal: "正常", needsConfirmation: "需确认", weakSignal: "信号较弱", workshopArea: "车间区域", locationDisclaimer: "人员位置示意 · 非精确定位", fullScreen: "全屏", workerOneTag: "李师傅 · 018", awaitingConfirmation: "待现场确认",
+        safetyEvents: "安全事件", eventsSubtitle: "现场与穿戴设备事件", eventRecords: "事件记录 →", eventHeartTitle: "王工 · 心率异常提醒", eventHeartBody: "仓储区 B1 · 请联系现场人员核实", eventSignalTitle: "设备 · 信号短暂中断", eventSignalBody: "检修区 C3 · 等待设备重新同步", acknowledge: "确认已处理", prototypeDisclaimer: "演示原型 · 实际告警阈值、定位精度、设备通信方式及数据权限须依据设备手册和现场方案配置",
+        mobileOverview: "总览", mobileWearables: "穿戴", mobilePeople: "人员", mobileEvents: "事件", mobileMore: "更多",
+        watchConnected: "演示手表已连接 · 工人 018", watchDisconnected: "演示手表已断开 · 未接收数据", disconnectDemo: "断开演示", connectDemo: "连接演示", acknowledged: "已确认",
+        toastConnected: "已切换为本地演示连接（非真实手表）", toastDisconnected: "已断开本地演示连接", toastManagement: "设备管理页面将在接入实际手表后配置", toastAcknowledged: "演示事件已标记为确认", toastModule: "当前为页面原型，其他模块待接入现有工业安全系统", title: "安巡 · 工业安全协同平台", ariaMain: "主导航", ariaMetrics: "现场指标", ariaMobile: "移动端导航"
+      },
+      en: {
+        workspace: "WORKSPACE", navOverview: "Safety overview", navWearables: "Wearables", navPeople: "People & zones", navEvents: "Events & alerts", navPatrols: "Inspection logs", management: "MANAGEMENT", deviceSettings: "Device settings",
+        siteName: "Production workshop 1", shiftHours: "Day shift · 08:00–20:00", industrySafety: "Industrial safety", onsiteOverview: "Site overview", systemRunning: "System operational", demoData: "Demo data", pageTitle: "Site safety overview", pageSubtitle: "Connect onsite personnel, wearable devices, and the safety operations center to monitor work conditions.", todayShift: "Nov 18, 2026 · Day shift",
+        workersOnsite: "Onsite personnel", peopleUnit: "people", normalPeople: "● 22 people in normal status", watchesOnline: "Watches online", lastSync: "Last sync", justNow: "Just now", pendingAlerts: "Pending alerts", confirmOnsite: "Onsite confirmation needed", todayPatrol: "Inspections today", timesUnit: "checks", patrolChange: "+4 vs. yesterday",
+        navReba: "Ergonomics", mobileReba: "REBA", rebaTitle: "Musculoskeletal health · REBA posture observation", rebaSubtitle: "Ergonomic screening based on work posture and task factors", screeningOnly: "Screening aid", rebaIntro: "Observe a representative work posture and flag body areas or task factors that may need attention. The checklist counts prompts to help plan a human review.",
+        groupUpperBody: "Neck, trunk & legs", groupUpperLimbs: "Upper arm, lower arm & wrist", groupTaskFactors: "Load, coupling & activity", neckLabel: "Neck posture", trunkLabel: "Trunk posture", legsLabel: "Legs & support", upperArmLabel: "Upper-arm posture", lowerArmLabel: "Lower-arm posture", wristLabel: "Wrist posture", loadLabel: "Load / force", couplingLabel: "Grip / coupling", activityLabel: "Activity pattern",
+        postureNeutral: "Neutral / aligned", postureCaution: "Slight deviation", postureConcern: "Marked deviation / twist / instability", loadLow: "Light load / low force", loadModerate: "Moderate load / noticeable force", loadHigh: "Heavy load / sudden or impact force", couplingGood: "Stable, easy-to-control grip", couplingFair: "Fair grip or requires adjustment", couplingPoor: "Difficult to hold or control", activityLow: "No notable repetition or sustained posture", activitySome: "Repeated action or sustained static posture", activityHigh: "Frequent repetition, prolonged static posture, or sudden large movements",
+        resetAssessment: "Reset", observationResult: "Observation prompts (not a REBA score)", flaggedFactors: "Areas / factors flagged", resultNoFlags: "No posture prompts selected", resultReview: "Supervisor review recommended", resultPriority: "Prioritize ergonomic review", recordObservation: "Record observation", recordEmpty: "No observations recorded", recordLabel: "Observation", rebaDisclaimer: "This is a REBA-factor observation aid, not an official REBA score or diagnosis. The count only reflects selected prompts and does not use the official REBA scoring tables. A trained assessor should perform and verify a full REBA assessment onsite. The camera does not automatically identify posture.",
+        centerBridgeTitle: "Connect to the Kyungwoon University control center", centerBridgeNote: "Use a control-center-issued SK code to open a live cloud relay; the control-center page must connect with the same code. Only manually selected posture-observation factors and their count are sent. No camera footage, names, or smartwatch health data are sent. The center receives a raw packet; it is not added to the official REBA report. The code is used temporarily for this browser session and cleared on disconnect.", centerConnect: "Connect control center", centerDisconnect: "Disconnect", centerSend: "Send observation", centerDisconnected: "Not connected · Access code is used only for this browser session", centerConnecting: "Connecting to secure relay…", centerConnected: "Live relay connected · Select a center site to send", centerConnectionError: "Connection failed: {error}", centerScriptError: "Could not load the control-center connector. Check your network and try again.", centerCodeRequired: "Enter the SK access code issued by the control center.", centerSiteRequired: "Enter a site code used by the control center.", centerNoSiteList: "Connected; no sites were listed. Enter a site code manually.", centerSendReady: "The current observation will be sent; no video, names, or smartwatch data.", centerSendError: "Send failed: the connection is offline or the payload is invalid.", centerSent: "Observation broadcast; verify receipt in the center's packet/raw JSON view.", centerSiteAria: "Control center site code", centerCodeAria: "Control center access code",
+        watchTitle: "Smartwatch · Live status", watchSubtitle: "Wearable data is for onsite safety coordination only", deviceManagement: "Manage devices →", safeState: "Safety status normal", heartRate: "Heart rate", bpm: "bpm", bodyTemperature: "Skin temperature", oxygenSaturation: "Blood oxygen", batteryLevel: "Battery",
+        watchDisclaimer: "These are frontend demo values, not real measurements. Real device connectivity requires Bluetooth/vendor SDK configuration for the watch model and authenticated server-side data ingestion.", cameraTitle: "Site camera · Live monitoring", cameraSubtitle: "Local browser preview and visual change monitoring", cameraOff: "Off", cameraPlaceholder: "Start the camera to see its live preview here", cameraLive: "LIVE", cameraSelectDefault: "Default camera", cameraStart: "Start camera", cameraStop: "Stop", motionLevelLabel: "Visual change (analyzed locally)", cameraDisclaimer: "Allow camera access in your browser when prompted. Video is displayed only on this device; change detection runs locally. No recording, uploads, face recognition, or worker safety judgments.", cameraRequesting: "Connecting", cameraPermissionError: "Camera permission was denied. Allow access in your browser settings.", cameraMissingError: "No available camera was found.", cameraUnavailableError: "The camera is in use by another app or could not start.", cameraSecureError: "Camera access requires an HTTPS or localhost page.", cameraGenericError: "Could not start the camera. Check the device and browser permissions.", noCamera: "—", motionWaiting: "Analyzing video…", motionQuiet: "Scene stable", motionDetected: "Visual change detected · {percent}%",
+        peopleTitle: "Onsite personnel", peopleSubtitle: "Personnel locations and wearable status", viewAll: "View all →", tablePerson: "Person", tableZone: "Work zone", tableDevice: "Device", tableSafety: "Safety status",
+        workerOne: "Worker Li", workerTwo: "Engineer Wang", workerThree: "Worker Chen", worker018: "ID 018", worker023: "ID 023", worker011: "ID 011", avatarOne: "L", avatarTwo: "W", avatarThree: "C",
+        zoneA2: "Assembly A2", zoneB1: "Warehouse B1", zoneC3: "Maintenance C3", watchOnline: "Watch online", normal: "Normal", needsConfirmation: "Check needed", weakSignal: "Weak signal", workshopArea: "Workshop zones", locationDisclaimer: "Illustrative locations · Not precise positioning", fullScreen: "Full screen", workerOneTag: "Worker Li · 018", awaitingConfirmation: "Awaiting onsite confirmation",
+        safetyEvents: "Safety events", eventsSubtitle: "Onsite and wearable device events", eventRecords: "Event log →", eventHeartTitle: "Engineer Wang · Heart rate alert", eventHeartBody: "Warehouse B1 · Contact onsite staff to verify", eventSignalTitle: "Device · Brief signal interruption", eventSignalBody: "Maintenance C3 · Waiting for device to sync", acknowledge: "Mark as handled", prototypeDisclaimer: "Demo prototype · Alert thresholds, positioning accuracy, device connectivity, and data permissions must be configured according to the device manual and site plan",
+        mobileOverview: "Overview", mobileWearables: "Wearables", mobilePeople: "People", mobileEvents: "Events", mobileMore: "More",
+        watchConnected: "Demo watch connected · Worker 018", watchDisconnected: "Demo watch disconnected · No data received", disconnectDemo: "Disconnect demo", connectDemo: "Connect demo", acknowledged: "Acknowledged",
+        toastConnected: "Local demo connected (not a real watch)", toastDisconnected: "Local demo disconnected", toastManagement: "Device management can be configured after the real watch is connected", toastAcknowledged: "Demo event marked as handled", toastModule: "This is a page prototype; other modules require integration with the existing safety system", title: "Anxun · Industrial Safety Platform", ariaMain: "Main navigation", ariaMetrics: "Site metrics", ariaMobile: "Mobile navigation"
+      },
+      ko: {
+        workspace: "작업 공간", navOverview: "안전 현황", navWearables: "웨어러블", navPeople: "작업자 및 구역", navEvents: "이벤트 및 경보", navPatrols: "점검 기록", management: "관리", deviceSettings: "장비 설정",
+        siteName: "제1 생산 작업장", shiftHours: "주간 근무 · 08:00–20:00", industrySafety: "산업 안전", onsiteOverview: "현장 개요", systemRunning: "시스템 정상 운영 중", demoData: "데모 데이터", pageTitle: "현장 안전 개요", pageSubtitle: "현장 작업자, 웨어러블 기기 및 안전 관제 센터를 연결해 작업 상태를 확인합니다.", todayShift: "2026년 11월 18일 · 주간 근무",
+        workersOnsite: "현장 작업자", peopleUnit: "명", normalPeople: "● 22명 정상 상태", watchesOnline: "온라인 워치", lastSync: "최근 동기화", justNow: "방금", pendingAlerts: "미처리 경보", confirmOnsite: "현장 확인 필요", todayPatrol: "오늘 점검", timesUnit: "회", patrolChange: "어제보다 +4회",
+        navReba: "근골격 평가", mobileReba: "REBA", rebaTitle: "근골격계 건강 · REBA 자세 관찰", rebaSubtitle: "작업 자세와 작업 요인 기반 인간공학 선별", screeningOnly: "관찰 선별", rebaIntro: "대표적인 작업 자세를 관찰하고 주의가 필요한 신체 부위와 작업 요인을 표시하세요. 표시 항목 수는 작업자 검토 계획을 돕기 위한 참고 정보입니다.",
+        groupUpperBody: "목, 몸통 및 다리", groupUpperLimbs: "위팔, 아래팔 및 손목", groupTaskFactors: "하중, 결합 및 작업 패턴", neckLabel: "목 자세", trunkLabel: "몸통 자세", legsLabel: "다리 및 지지", upperArmLabel: "위팔 자세", lowerArmLabel: "아래팔 자세", wristLabel: "손목 자세", loadLabel: "하중 / 힘", couplingLabel: "그립 / 결합", activityLabel: "작업 패턴",
+        postureNeutral: "중립 / 바른 자세", postureCaution: "약간 벗어남", postureConcern: "뚜렷한 이탈 / 비틀림 / 불안정", loadLow: "가벼운 하중 / 적은 힘", loadModerate: "중간 하중 / 상당한 힘 필요", loadHigh: "무거운 하중 / 급격하거나 충격이 있는 힘", couplingGood: "안정적이고 제어하기 쉬운 그립", couplingFair: "보통 그립 또는 조정 필요", couplingPoor: "잡거나 제어하기 어려움", activityLow: "뚜렷한 반복 또는 지속 자세 없음", activitySome: "반복 동작 또는 지속적인 정적 자세", activityHigh: "잦은 반복, 장시간 정적 자세 또는 갑작스러운 큰 동작",
+        resetAssessment: "초기화", observationResult: "관찰 항목 (REBA 점수 아님)", flaggedFactors: "주의 부위 / 요인", resultNoFlags: "표시된 자세 항목 없음", resultReview: "관리자 검토 권장", resultPriority: "인간공학 검토 우선 권장", recordObservation: "관찰 기록", recordEmpty: "기록된 관찰 없음", recordLabel: "관찰", rebaDisclaimer: "이 기능은 REBA 요인 관찰 보조용 프로토타입이며 공식 REBA 점수나 진단이 아닙니다. 표시 수는 선택 항목만 집계하며 공식 REBA 점수표를 사용하지 않습니다. 정식 평가는 교육받은 평가자가 전체 REBA 방법으로 현장에서 관찰하고 검토해야 합니다. 카메라는 자세를 자동으로 인식하지 않습니다.",
+        centerBridgeTitle: "경운대학교 관제센터 연결", centerBridgeNote: "관제센터에서 발급한 SK 코드로 실시간 클라우드 중계에 연결합니다. 관제센터 페이지도 같은 코드로 연결해야 합니다. 직접 선택한 자세 관찰 요인과 개수만 전송하며, 카메라 영상·이름·스마트워치 건강 데이터는 전송하지 않습니다. 관제센터에는 원시 패킷으로 수신되며 공식 REBA 보고서에는 저장되지 않습니다. 코드는 현재 브라우저 세션에서만 임시 사용하고 연결 해제 시 삭제합니다.", centerConnect: "관제센터 연결", centerDisconnect: "연결 해제", centerSend: "관찰 결과 전송", centerDisconnected: "연결되지 않음 · 코드는 현재 브라우저 세션에서만 사용됩니다", centerConnecting: "보안 중계에 연결 중…", centerConnected: "실시간 중계 연결됨 · 관제 사이트를 선택하세요", centerConnectionError: "연결 실패: {error}", centerScriptError: "관제센터 연결 구성 요소를 불러오지 못했습니다. 네트워크를 확인하고 다시 시도하세요.", centerCodeRequired: "관제센터에서 발급한 SK 코드를 입력하세요.", centerSiteRequired: "관제센터에서 사용하는 사이트 코드를 입력하세요.", centerNoSiteList: "연결되었습니다. 사이트 목록이 없습니다. 사이트 코드를 직접 입력하세요.", centerSendReady: "현재 관찰 항목을 전송합니다. 영상·이름·워치 데이터는 포함되지 않습니다.", centerSendError: "전송 실패: 연결이 끊겼거나 데이터 형식이 올바르지 않습니다.", centerSent: "관찰 결과를 브로드캐스트했습니다. 관제센터의 패킷/원시 JSON 보기에서 수신 여부를 확인하세요.", centerSiteAria: "관제센터 사이트 코드", centerCodeAria: "관제센터 접속 코드",
+        watchTitle: "스마트워치 · 실시간 상태", watchSubtitle: "웨어러블 데이터는 현장 안전 협업 용도로만 사용됩니다", deviceManagement: "장비 관리 →", safeState: "안전 상태 정상", heartRate: "심박수", bpm: "bpm", bodyTemperature: "피부 온도", oxygenSaturation: "혈중 산소 포화도", batteryLevel: "배터리 잔량",
+        watchDisclaimer: "현재 값은 프런트엔드 데모 데이터이며 실제 측정값이 아닙니다. 실제 기기 연결에는 워치 모델에 맞는 Bluetooth/제조사 SDK 설정과 인증된 서버 측 데이터 수신이 필요합니다.", cameraTitle: "현장 카메라 · 실시간 모니터링", cameraSubtitle: "이 기기에서 영상 미리보기와 화면 변화 감지", cameraOff: "꺼짐", cameraPlaceholder: "카메라를 시작하면 여기에 실시간 화면이 표시됩니다", cameraLive: "실시간", cameraSelectDefault: "기본 카메라", cameraStart: "카메라 시작", cameraStop: "중지", motionLevelLabel: "화면 변화 (이 기기에서 분석)", cameraDisclaimer: "브라우저의 카메라 접근 권한을 허용해야 합니다. 영상은 이 기기에서만 표시되며 변화 감지도 로컬에서 처리됩니다. 녹화·업로드·얼굴 인식·작업자 안전 판단은 수행하지 않습니다.", cameraRequesting: "연결 중", cameraPermissionError: "카메라 권한이 거부되었습니다. 브라우저 설정에서 접근을 허용하세요.", cameraMissingError: "사용 가능한 카메라를 찾을 수 없습니다.", cameraUnavailableError: "카메라가 다른 앱에서 사용 중이거나 시작할 수 없습니다.", cameraSecureError: "카메라 접근은 HTTPS 또는 localhost 페이지에서만 가능합니다.", cameraGenericError: "카메라를 시작할 수 없습니다. 장치와 브라우저 권한을 확인하세요.", noCamera: "—", motionWaiting: "화면 분석 중…", motionQuiet: "화면 안정", motionDetected: "화면 변화 감지 · {percent}%",
+        peopleTitle: "현장 작업자", peopleSubtitle: "작업자 위치 및 웨어러블 상태", viewAll: "전체 보기 →", tablePerson: "작업자", tableZone: "작업 구역", tableDevice: "기기 상태", tableSafety: "안전 상태",
+        workerOne: "작업자 리", workerTwo: "엔지니어 왕", workerThree: "작업자 천", worker018: "사번 018", worker023: "사번 023", worker011: "사번 011", avatarOne: "리", avatarTwo: "왕", avatarThree: "천",
+        zoneA2: "조립 구역 A2", zoneB1: "창고 구역 B1", zoneC3: "정비 구역 C3", watchOnline: "워치 온라인", normal: "정상", needsConfirmation: "확인 필요", weakSignal: "신호 약함", workshopArea: "작업장 구역", locationDisclaimer: "작업자 위치 예시 · 정밀 위치가 아님", fullScreen: "전체 화면", workerOneTag: "작업자 리 · 018", awaitingConfirmation: "현장 확인 대기",
+        safetyEvents: "안전 이벤트", eventsSubtitle: "현장 및 웨어러블 기기 이벤트", eventRecords: "이벤트 기록 →", eventHeartTitle: "엔지니어 왕 · 심박수 이상 알림", eventHeartBody: "창고 구역 B1 · 현장 담당자에게 확인 요청", eventSignalTitle: "기기 · 일시적 신호 끊김", eventSignalBody: "정비 구역 C3 · 기기 재동기화 대기", acknowledge: "처리 완료 확인", prototypeDisclaimer: "데모 프로토타입 · 경보 임계값, 위치 정확도, 기기 통신 방식 및 데이터 권한은 기기 설명서와 현장 계획에 따라 설정해야 합니다",
+        mobileOverview: "개요", mobileWearables: "웨어러블", mobilePeople: "작업자", mobileEvents: "이벤트", mobileMore: "더보기",
+        watchConnected: "데모 워치 연결됨 · 작업자 018", watchDisconnected: "데모 워치 연결 해제됨 · 데이터 수신 안 됨", disconnectDemo: "데모 연결 해제", connectDemo: "데모 연결", acknowledged: "확인 완료",
+        toastConnected: "로컬 데모 연결됨 (실제 워치 아님)", toastDisconnected: "로컬 데모 연결 해제됨", toastManagement: "실제 워치 연동 후 장비 관리 기능을 설정할 수 있습니다", toastAcknowledged: "데모 이벤트를 처리 완료로 표시했습니다", toastModule: "페이지 프로토타입입니다. 다른 모듈은 기존 산업 안전 시스템과 연동해야 합니다", title: "안쉰 · 산업 안전 협업 플랫폼", ariaMain: "주 메뉴", ariaMetrics: "현장 지표", ariaMobile: "모바일 메뉴"
+      }
+    };
+    const toast = document.getElementById("toast");
+    let toastTimer;
+    let language = "zh";
+    let cameraStream = null;
+    let cameraTimer = null;
+    let previousFrame = null;
+    let cameraLive = false;
+    let cameraDeviceCount = 0;
+    const rebaFactors = [...document.querySelectorAll("[data-reba-factor]")];
+    const rebaRecords = [];
+    let controlConnected = false;
+    let controlConnecting = false;
+    let controlStatusKey = "";
+    let controlError = "";
+    let controlScriptPromise = null;
+    let controlPacketSequence = 0;
+
+    function updateControlCenterUI() {
+      const text = messages[language];
+      const status = document.getElementById("center-status");
+      status.textContent = controlError
+        ? text.centerConnectionError.replace("{error}", controlError)
+        : controlStatusKey
+          ? text[controlStatusKey]
+          : text[controlConnecting ? "centerConnecting" : controlConnected ? "centerConnected" : "centerDisconnected"];
+      status.classList.toggle("connected", controlConnected && !controlError && !controlStatusKey);
+      document.getElementById("center-code").disabled = controlConnected || controlConnecting;
+      document.getElementById("center-connect").hidden = controlConnected;
+      document.getElementById("center-disconnect").hidden = !controlConnected;
+      document.getElementById("center-site").disabled = !controlConnected;
+      document.getElementById("center-send").disabled = !controlConnected || !document.getElementById("center-site").value.trim();
+      document.getElementById("center-code").setAttribute("aria-label", text.centerCodeAria);
+      document.getElementById("center-site").setAttribute("aria-label", text.centerSiteAria);
+      document.getElementById("center-code").placeholder = language === "zh" ? "SK-XXXX-XXXX-XXXX-XXXX" : "SK-XXXX-XXXX-XXXX-XXXX";
+      document.getElementById("center-site").placeholder = language === "zh" ? "例如：KWANGSUNG-01" : language === "ko" ? "예: KWANGSUNG-01" : "e.g. KWANGSUNG-01";
+    }
+
+    function loadControlScript(id, path, integrity) {
+      const existing = document.getElementById(id);
+      if (existing) return Promise.resolve();
+      return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.id = id;
+        script.src = `https://shinek-wansuk-ai-safety.vercel.app/${path}`;
+        script.integrity = integrity;
+        script.crossOrigin = "anonymous";
+        script.onload = resolve;
+        script.onerror = () => {
+          script.remove();
+          reject(new Error("Pinned control-center script could not be loaded or verified."));
+        };
+        document.head.append(script);
+      });
+    }
+
+    async function getControlCenterCloud() {
+      if (!controlScriptPromise) {
+        controlScriptPromise = (async () => {
+          await loadControlScript("control-center-supabase", "vendor/supabase/2.45.4/supabase.min.js", "sha256-lid+wA4Z30dtc5aoolhrQe0QM9z2gPWqebDFVgWXkrg=");
+          await loadControlScript("control-center-cloud", "js/twin-cloud.js", "sha256-QVOekR35fIqZRyrY8dppTIxxRHyD7/62Jb6JGJibjm8=");
+          if (!window.SHKTwinCloud) throw new Error("Control-center connector did not initialize.");
+          const cloud = window.SHKTwinCloud;
+          cloud.onState((state, error) => {
+            controlConnecting = state === "connecting";
+            controlConnected = state === "on";
+            controlError = state === "error" ? error : "";
+            controlStatusKey = "";
+            updateControlCenterUI();
+          });
+          cloud.onPacket(packet => {
+            if (packet?.app === "shinek-twin" && packet?.type === "center-hello") {
+              controlStatusKey = "centerConnected";
+              updateControlCenterUI();
+            }
+          });
+          return cloud;
+        })().catch(error => {
+          controlScriptPromise = null;
+          throw error;
+        });
+      }
+      return controlScriptPromise;
+    }
+
+    async function connectControlCenter() {
+      const codeInput = document.getElementById("center-code");
+      const code = codeInput.value.trim();
+      if (!code) {
+        controlStatusKey = "centerCodeRequired";
+        controlError = "";
+        updateControlCenterUI();
+        return;
+      }
+      codeInput.value = "";
+      controlConnecting = true;
+      controlStatusKey = "";
+      controlError = "";
+      updateControlCenterUI();
+      try {
+        const cloud = await getControlCenterCloud();
+        await cloud.connect(code, { remember: false });
+        const siteInput = document.getElementById("center-site");
+        const siteList = document.getElementById("center-sites");
+        siteList.replaceChildren();
+        try {
+          const rows = await cloud.sites();
+          if (Array.isArray(rows)) {
+            rows.forEach(row => {
+              if (typeof row.site !== "string" || !row.site) return;
+              const option = document.createElement("option");
+              option.value = row.site;
+              option.label = row.name ? `${row.site} · ${row.name}` : row.site;
+              siteList.append(option);
+            });
+            if (!siteInput.value && rows.length) siteInput.value = rows[0].site || "";
+          }
+        } catch (error) {
+          console.error("Could not retrieve control-center site suggestions.", error);
+        }
+        controlStatusKey = siteList.options.length ? "" : "centerNoSiteList";
+      } catch (error) {
+        controlError = error.message || messages[language].centerScriptError;
+        console.error("Control-center connection failed.", error);
+      } finally {
+        controlConnecting = false;
+        updateControlCenterUI();
+      }
+    }
+
+    async function disconnectControlCenter() {
+      const cloud = window.SHKTwinCloud;
+      if (cloud) await cloud.disconnect();
+      controlConnected = false;
+      controlConnecting = false;
+      controlStatusKey = "";
+      controlError = "";
+      document.getElementById("center-site").value = "";
+      document.getElementById("center-sites").replaceChildren();
+      updateControlCenterUI();
+    }
+
+    function sendRebaObservation() {
+      const cloud = window.SHKTwinCloud;
+      const site = document.getElementById("center-site").value.trim();
+      if (!cloud?.on()) {
+        controlConnected = false;
+        controlStatusKey = "centerSendError";
+        controlError = "";
+        updateControlCenterUI();
+        return;
+      }
+      if (!/^[A-Za-z0-9._-]{1,80}$/.test(site)) {
+        controlStatusKey = "centerSiteRequired";
+        controlError = "";
+        updateControlCenterUI();
+        return;
+      }
+      const flaggedFactors = rebaFactors
+        .filter(factor => Number(factor.value) > 0)
+        .map(factor => ({ factor: factor.id.replace("reba-", ""), level: Number(factor.value) }));
+      const payload = {
+        site,
+        observedAt: new Date().toISOString(),
+        source: "manual-reba-factor-screening",
+        factorCount: rebaFactors.length,
+        flaggedCount: flaggedFactors.length,
+        flaggedFactors
+      };
+      const packet = {
+        app: "shinek-twin",
+        v: 1,
+        type: "reba-observation",
+        from: "company-reba",
+        role: "company",
+        seq: ++controlPacketSequence,
+        sentAt: Date.now(),
+        payload
+      };
+      packet.bytes = new TextEncoder().encode(JSON.stringify(packet)).length;
+      try {
+        cloud.send(packet);
+        controlStatusKey = "centerSent";
+        controlError = "";
+      } catch (error) {
+        controlStatusKey = "centerSendError";
+        controlError = "";
+        console.error("REBA observation broadcast failed.", error);
+      }
+      updateControlCenterUI();
+    }
+
+    function applyLanguage(nextLanguage) {
+      language = nextLanguage;
+      const text = messages[language];
+      document.documentElement.lang = language === "zh" ? "zh-CN" : language;
+      document.title = text.title;
+      document.querySelectorAll("[data-i18n]").forEach(element => {
+        const key = element.dataset.i18n;
+        if (text[key] !== undefined) element.textContent = text[key];
+      });
+      document.querySelectorAll("[data-lang]").forEach(button => {
+        const selected = button.dataset.lang === language;
+        button.classList.toggle("active", selected);
+        button.setAttribute("aria-pressed", String(selected));
+      });
+      document.querySelector('.nav[aria-label]').setAttribute("aria-label", text.ariaMain);
+      document.querySelector(".metrics").setAttribute("aria-label", text.ariaMetrics);
+      document.querySelector(".mobile-nav").setAttribute("aria-label", text.ariaMobile);
+      document.querySelector(".language-switch").setAttribute("aria-label", language === "zh" ? "切换语言" : language === "en" ? "Switch language" : "언어 변경");
+      document.getElementById("connection-text").textContent = text[connected ? "watchConnected" : "watchDisconnected"];
+      document.getElementById("connect-btn").textContent = text[connected ? "disconnectDemo" : "connectDemo"];
+      document.getElementById("watch-count").innerHTML = `${connected ? 18 : 17} <span style="font-size:13px;font-weight:450">/ 24</span>`;
+      const cameraState = document.getElementById("camera-state");
+      cameraState.textContent = text[cameraLive ? "cameraLive" : "cameraOff"];
+      cameraState.classList.toggle("muted", !cameraLive);
+      document.getElementById("camera-start").textContent = text.cameraStart;
+      document.getElementById("camera-stop").textContent = text.cameraStop;
+      document.getElementById("camera-placeholder").querySelector("[data-i18n]").textContent = text.cameraPlaceholder;
+      document.getElementById("camera-overlay").querySelector("[data-i18n]").textContent = text.cameraLive;
+      document.querySelector(".camera-controls select").setAttribute("aria-label", language === "zh" ? "选择摄像头" : language === "en" ? "Select camera" : "카메라 선택");
+      document.getElementById("camera-video").setAttribute("aria-label", language === "zh" ? "现场摄像头实时预览" : language === "en" ? "Live site camera preview" : "현장 카메라 실시간 미리보기");
+      document.getElementById("camera-select").options[0].textContent = text.cameraSelectDefault;
+      if (cameraLive) document.getElementById("motion-level").textContent = text.motionWaiting;
+      else document.getElementById("motion-level").textContent = text.noCamera;
+      updateRebaSummary();
+      renderRebaRecords();
+      updateControlCenterUI();
+    }
+    function notify(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+    function updateRebaSummary() {
+      const flagged = rebaFactors.filter(factor => Number(factor.value) > 0).length;
+      const resultKey = flagged === 0 ? "resultNoFlags" : flagged >= 3 ? "resultPriority" : "resultReview";
+      document.getElementById("reba-count").textContent = `${flagged} / ${rebaFactors.length}`;
+      document.getElementById("reba-result").textContent = messages[language][resultKey];
+    }
+
+    function renderRebaRecords() {
+      const container = document.getElementById("reba-records");
+      container.replaceChildren();
+      if (!rebaRecords.length) {
+        const empty = document.createElement("span");
+        empty.className = "watch-note";
+        empty.textContent = messages[language].recordEmpty;
+        container.append(empty);
+        return;
+      }
+      rebaRecords.slice(0, 5).forEach(record => {
+        const row = document.createElement("div");
+        row.className = "reba-record";
+        const title = document.createElement("span");
+        title.textContent = messages[language].recordLabel;
+        const detail = document.createElement("span");
+        detail.textContent = `${new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : language === "ko" ? "ko-KR" : "en-US", { hour: "2-digit", minute: "2-digit" }).format(record.time)} · ${record.flagged} / ${rebaFactors.length}`;
+        row.append(title, detail);
+        container.append(row);
+      });
+    }
+
+    let connected = true;
+    document.querySelectorAll("[data-lang]").forEach(button => button.addEventListener("click", () => applyLanguage(button.dataset.lang)));
+    applyLanguage(language);
+    rebaFactors.forEach(factor => factor.addEventListener("change", updateRebaSummary));
+    document.getElementById("reba-reset").addEventListener("click", () => {
+      rebaFactors.forEach(factor => { factor.value = "0"; });
+      updateRebaSummary();
+    });
+    document.getElementById("reba-record").addEventListener("click", () => {
+      rebaRecords.unshift({ time: new Date(), flagged: rebaFactors.filter(factor => Number(factor.value) > 0).length });
+      renderRebaRecords();
+    });
+    document.getElementById("center-connect").addEventListener("click", connectControlCenter);
+    document.getElementById("center-code").addEventListener("keydown", event => {
+      if (event.key === "Enter") connectControlCenter();
+    });
+    document.getElementById("center-disconnect").addEventListener("click", () => {
+      disconnectControlCenter().catch(error => {
+        controlError = error.message;
+        updateControlCenterUI();
+      });
+    });
+    document.getElementById("center-site").addEventListener("input", updateControlCenterUI);
+    document.getElementById("center-send").addEventListener("click", sendRebaObservation);
+    document.getElementById("connect-btn").addEventListener("click", event => {
+      connected = !connected;
+      const status = document.getElementById("watch-status");
+      status.classList.toggle("disconnected", !connected);
+      applyLanguage(language);
+      notify(messages[language][connected ? "toastConnected" : "toastDisconnected"]);
+    });
+    document.getElementById("connect-link").addEventListener("click", () => notify(messages[language].toastManagement));
+    const cameraVideo = document.getElementById("camera-video");
+    const cameraSelect = document.getElementById("camera-select");
+    const cameraStartButton = document.getElementById("camera-start");
+    const cameraStopButton = document.getElementById("camera-stop");
+    const cameraState = document.getElementById("camera-state");
+    const cameraPlaceholder = document.getElementById("camera-placeholder");
+    const cameraOverlay = document.getElementById("camera-overlay");
+    const motionLevel = document.getElementById("motion-level");
+    const motionCanvas = document.createElement("canvas");
+    motionCanvas.width = 160;
+    motionCanvas.height = 90;
+    const motionContext = motionCanvas.getContext("2d", { willReadFrequently: true });
+
+    function updateMotion() {
+      if (!cameraLive || cameraVideo.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
+      motionContext.drawImage(cameraVideo, 0, 0, motionCanvas.width, motionCanvas.height);
+      const frame = motionContext.getImageData(0, 0, motionCanvas.width, motionCanvas.height).data;
+      if (previousFrame) {
+        let changedPixels = 0;
+        const totalPixels = frame.length / 4;
+        for (let i = 0; i < frame.length; i += 4) {
+          const difference = (Math.abs(frame[i] - previousFrame[i]) + Math.abs(frame[i + 1] - previousFrame[i + 1]) + Math.abs(frame[i + 2] - previousFrame[i + 2])) / 3;
+          if (difference > 30) changedPixels++;
+        }
+        const percent = Math.round(changedPixels / totalPixels * 1000) / 10;
+        motionLevel.textContent = percent >= 3.5
+          ? messages[language].motionDetected.replace("{percent}", percent.toFixed(1))
+          : messages[language].motionQuiet;
+      }
+      previousFrame = new Uint8ClampedArray(frame);
+    }
+
+    async function listCameras() {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const selectedId = cameraSelect.value;
+      cameraSelect.replaceChildren(new Option(messages[language].cameraSelectDefault, ""));
+      const cameras = devices.filter(device => device.kind === "videoinput");
+      cameraDeviceCount = cameras.length;
+      cameras.forEach((device, index) => {
+        cameraSelect.add(new Option(device.label || `Camera ${index + 1}`, device.deviceId));
+      });
+      if (devices.some(device => device.deviceId === selectedId)) cameraSelect.value = selectedId;
+      cameraSelect.disabled = cameraDeviceCount < 2;
+    }
+
+    function cameraErrorMessage(error) {
+      if (!window.isSecureContext) return messages[language].cameraSecureError;
+      if (!navigator.mediaDevices?.getUserMedia) return messages[language].cameraGenericError;
+      if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError" || error.name === "SecurityError") return messages[language].cameraPermissionError;
+      if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") return messages[language].cameraMissingError;
+      if (error.name === "NotReadableError" || error.name === "TrackStartError" || error.name === "AbortError") return messages[language].cameraUnavailableError;
+      return messages[language].cameraGenericError;
+    }
+
+    async function startCamera() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        notify(cameraErrorMessage(new Error("getUserMedia unavailable")));
+        return;
+      }
+      cameraStartButton.disabled = true;
+      cameraState.textContent = messages[language].cameraRequesting;
+      cameraState.classList.add("muted");
+      try {
+        const deviceId = cameraSelect.value;
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: deviceId ? { deviceId: { exact: deviceId } } : { facingMode: { ideal: "environment" } }
+        });
+        cameraStream = stream;
+        cameraVideo.srcObject = stream;
+        await cameraVideo.play();
+        cameraLive = true;
+        previousFrame = null;
+        cameraPlaceholder.hidden = true;
+        cameraOverlay.hidden = false;
+        cameraStartButton.disabled = true;
+        cameraStopButton.disabled = false;
+        cameraSelect.disabled = true;
+        applyLanguage(language);
+        cameraTimer = setInterval(updateMotion, 900);
+        await listCameras();
+        cameraSelect.disabled = false;
+        stream.getVideoTracks()[0].addEventListener("ended", stopCamera, { once: true });
+      } catch (error) {
+        stopCamera();
+        notify(cameraErrorMessage(error));
+      } finally {
+        if (!cameraLive) cameraStartButton.disabled = false;
+      }
+    }
+
+    function stopCamera() {
+      if (cameraTimer !== null) clearInterval(cameraTimer);
+      cameraTimer = null;
+      if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = null;
+      cameraVideo.srcObject = null;
+      cameraLive = false;
+      previousFrame = null;
+      cameraPlaceholder.hidden = false;
+      cameraOverlay.hidden = true;
+      cameraStartButton.disabled = false;
+      cameraStopButton.disabled = true;
+      cameraSelect.disabled = cameraDeviceCount < 2;
+      motionLevel.textContent = messages[language].noCamera;
+      cameraState.textContent = messages[language].cameraOff;
+      cameraState.classList.add("muted");
+    }
+
+    cameraStartButton.addEventListener("click", startCamera);
+    cameraStopButton.addEventListener("click", stopCamera);
+    cameraSelect.addEventListener("change", () => {
+      if (cameraLive) {
+        stopCamera();
+        startCamera();
+      }
+    });
+    window.addEventListener("pagehide", () => {
+      stopCamera();
+      if (window.SHKTwinCloud?.on()) window.SHKTwinCloud.disconnect().catch(error => console.error("Could not close the control-center relay.", error));
+    }, { once: true });
+    navigator.mediaDevices?.addEventListener?.("devicechange", () => {
+      if (cameraLive) listCameras().catch(() => notify(messages[language].cameraGenericError));
+    });
+    document.querySelectorAll(".ack-btn").forEach(button => button.addEventListener("click", () => {
+      const event = button.closest(".event");
+      event.classList.add("acknowledged");
+      button.textContent = messages[language].acknowledged;
+      const count = document.getElementById("alert-count");
+      count.textContent = String(Math.max(0, Number(count.textContent) - 1)).padStart(2, "0");
+      notify(messages[language].toastAcknowledged);
+    }));
+    document.querySelectorAll("[data-nav]").forEach(button => button.addEventListener("click", () => {
+      document.querySelectorAll("[data-nav]").forEach(item => item.classList.toggle("active", item.dataset.nav === button.dataset.nav));
+      if (button.dataset.nav === "overview") window.scrollTo({ top: 0, behavior: "smooth" });
+      else if (button.dataset.nav === "reba") document.getElementById("reba-module").scrollIntoView({ behavior: "smooth", block: "start" });
+      else notify(messages[language].toastModule);
+    }));
+    setInterval(() => {
+      if (!connected) return;
+      const bpm = 75 + Math.floor(Math.random() * 8);
+      document.getElementById("heart-rate").innerHTML = bpm + "<em>bpm</em>";
+      document.getElementById("watch-bpm").textContent = bpm;
+      document.getElementById("sync-time").textContent = messages[language].justNow;
+    }, 5000);
+  </script>
+</body>
+</html>
