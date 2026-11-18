@@ -421,7 +421,7 @@
                 <div class="camera-overlay" id="camera-overlay" hidden><i class="live-dot"></i><span data-i18n="cameraLive">实时画面</span></div>
               </div>
               <div class="camera-controls">
-                <select id="camera-select" aria-label="Camera device" disabled><option data-i18n="cameraSelectDefault">默认摄像头</option></select>
+                <select id="camera-select" aria-label="Camera device" disabled><option value="" data-i18n="cameraSelectDefault">默认摄像头</option></select>
                 <button class="primary-btn" id="camera-start" type="button" data-i18n="cameraStart">启动摄像头</button>
                 <button class="outline-btn" id="camera-stop" type="button" data-i18n="cameraStop" disabled>停止</button>
               </div>
@@ -476,7 +476,7 @@
     const messages = {
       zh: {
         workspace: "工作空间", navOverview: "安全总览", navWearables: "智能穿戴", navPeople: "人员与区域", navEvents: "事件与告警", navPatrols: "巡检记录", management: "管理", deviceSettings: "设备设置",
-        splitTitle: "企业现场 ↔ 控制中心 · 实时协同视图", splitDescription: "左侧展示现场摄像头与穿戴设备；右侧汇总区域和姿态观察。视频仅在本机处理，不传送到控制中心。", splitDemoState: "浏览器演示 · 尚未连接真实中继", splitLayoutLabel: "画面布局", splitHorizontal: "左右", splitVertical: "上下", splitCompanyNarrow: "现场窄屏", splitHalf: "各半", splitCompanyWide: "现场宽屏", splitSwap: "交换画面顺序", companyPaneTitle: "① 企业现场 · 摄像头 + 智能手表", companyPaneStatus: "现场本机", centerPaneTitle: "② 控制中心 · 区域态势", centerPaneStatus: "汇总视图", splitDataPose: "姿态 / 观察", splitDataLocal: "本机分析", splitDataWearable: "穿戴设备", splitDataDemo: "演示数据", splitDataVideo: "视频传输", splitDataNone: "未发送", splitDataRelay: "实时中继", splitDataOffline: "未连接", splitPrivacy: "本机摄像头需要明确授权。姿态估计仅在本机实时运行；演示页面不上传视频、骨架坐标或个人身份信息。控制中心连接需有效授权码及站点配置。",
+        splitTitle: "企业现场 ↔ 控制中心 · 实时协同视图", splitDescription: "左侧展示现场摄像头与穿戴设备；右侧汇总区域和姿态观察。视频仅在本机处理，不传送到控制中心。", splitDemoState: "浏览器演示 · 尚未连接真实中继", splitLayoutLabel: "画面布局", splitHorizontal: "左右", splitVertical: "上下", splitCompanyNarrow: "现场窄屏", splitHalf: "各半", splitCompanyWide: "现场宽屏", splitSwap: "交换画面顺序", companyPaneTitle: "① 企业现场 · 摄像头 + 智能手表", companyPaneStatus: "现场本机", centerPaneTitle: "② 控制中心 · 区域态势", centerPaneStatus: "汇总视图", splitDataPose: "姿态 / 观察", splitDataLocal: "本机分析", splitDataWearable: "穿戴设备", splitDataDemo: "演示数据", splitDataVideo: "视频传输", splitDataNone: "未发送", splitDataRelay: "实时中继", splitDataOffline: "未连接", splitPrivacy: "本机摄像头需要明确授权。姿态估计仅在本机实时运行；演示页面不上传视频、骨架坐标或个人身份信息。控制中心连接需有效授权码及站点配置。", cameraDeviceError: "所选摄像头不可用，请选择其他设备或使用默认摄像头。",
         siteName: "一号生产车间", shiftHours: "日班 · 08:00–20:00", industrySafety: "工业安全", onsiteOverview: "现场总览", systemRunning: "系统运行中", demoData: "演示数据", pageTitle: "现场安全总览", pageSubtitle: "连接现场人员、智能穿戴设备与安全监控中心，及时掌握作业状态。", todayShift: "2026年11月18日 · 日班",
         workersOnsite: "现场人员", peopleUnit: "人", normalPeople: "● 22 人状态正常", watchesOnline: "在线手表", lastSync: "最近同步", justNow: "刚刚", pendingAlerts: "待处理告警", confirmOnsite: "需现场确认", todayPatrol: "今日巡检", timesUnit: "次", patrolChange: "较昨日 +4 次",
         navReba: "肌骨风险", mobileReba: "肌骨", rebaTitle: "肌肉骨骼健康 · REBA 姿势观察", rebaSubtitle: "基于工作姿势与任务因素的人体工效筛查", screeningOnly: "观察筛查", rebaIntro: "观察一个具有代表性的工作姿势，逐项标记需要关注的部位和任务因素。系统统计提示项，帮助安排人工复核。",
@@ -496,7 +496,7 @@
       },
       en: {
         workspace: "WORKSPACE", navOverview: "Safety overview", navWearables: "Wearables", navPeople: "People & zones", navEvents: "Events & alerts", navPatrols: "Inspection logs", management: "MANAGEMENT", deviceSettings: "Device settings",
-        splitTitle: "Company site ↔ Operations center · Live collaboration", splitDescription: "The left side shows the site camera and wearable; the right summarizes work zones and pose observations. Video stays on this device and is not sent to the center.", splitDemoState: "Browser demo · No live relay connected", splitLayoutLabel: "Layout", splitHorizontal: "Side by side", splitVertical: "Stacked", splitCompanyNarrow: "Narrow site", splitHalf: "Equal", splitCompanyWide: "Wide site", splitSwap: "Swap panels", companyPaneTitle: "① Company site · Camera + smartwatch", companyPaneStatus: "On this device", centerPaneTitle: "② Operations center · Site overview", centerPaneStatus: "Summary view", splitDataPose: "Pose / observation", splitDataLocal: "On-device", splitDataWearable: "Wearable", splitDataDemo: "Demo data", splitDataVideo: "Video transfer", splitDataNone: "Not sent", splitDataRelay: "Live relay", splitDataOffline: "Not connected", splitPrivacy: "Camera access requires your permission. Pose estimation runs locally; this demo does not upload video, skeleton coordinates, or identity data. Connecting to an operations center requires valid credentials and site configuration.",
+        splitTitle: "Company site ↔ Operations center · Live collaboration", splitDescription: "The left side shows the site camera and wearable; the right summarizes work zones and pose observations. Video stays on this device and is not sent to the center.", splitDemoState: "Browser demo · No live relay connected", splitLayoutLabel: "Layout", splitHorizontal: "Side by side", splitVertical: "Stacked", splitCompanyNarrow: "Narrow site", splitHalf: "Equal", splitCompanyWide: "Wide site", splitSwap: "Swap panels", companyPaneTitle: "① Company site · Camera + smartwatch", companyPaneStatus: "On this device", centerPaneTitle: "② Operations center · Site overview", centerPaneStatus: "Summary view", splitDataPose: "Pose / observation", splitDataLocal: "On-device", splitDataWearable: "Wearable", splitDataDemo: "Demo data", splitDataVideo: "Video transfer", splitDataNone: "Not sent", splitDataRelay: "Live relay", splitDataOffline: "Not connected", splitPrivacy: "Camera access requires your permission. Pose estimation runs locally; this demo does not upload video, skeleton coordinates, or identity data. Connecting to an operations center requires valid credentials and site configuration.", cameraDeviceError: "The selected camera is unavailable. Choose another device or use the default camera.",
         siteName: "Production workshop 1", shiftHours: "Day shift · 08:00–20:00", industrySafety: "Industrial safety", onsiteOverview: "Site overview", systemRunning: "System operational", demoData: "Demo data", pageTitle: "Site safety overview", pageSubtitle: "Connect onsite personnel, wearable devices, and the safety operations center to monitor work conditions.", todayShift: "Nov 18, 2026 · Day shift",
         workersOnsite: "Onsite personnel", peopleUnit: "people", normalPeople: "● 22 people in normal status", watchesOnline: "Watches online", lastSync: "Last sync", justNow: "Just now", pendingAlerts: "Pending alerts", confirmOnsite: "Onsite confirmation needed", todayPatrol: "Inspections today", timesUnit: "checks", patrolChange: "+4 vs. yesterday",
         navReba: "Ergonomics", mobileReba: "REBA", rebaTitle: "Musculoskeletal health · REBA posture observation", rebaSubtitle: "Ergonomic screening based on work posture and task factors", screeningOnly: "Screening aid", rebaIntro: "Observe a representative work posture and flag body areas or task factors that may need attention. The checklist counts prompts to help plan a human review.",
@@ -516,7 +516,7 @@
       },
       ko: {
         workspace: "작업 공간", navOverview: "안전 현황", navWearables: "웨어러블", navPeople: "작업자 및 구역", navEvents: "이벤트 및 경보", navPatrols: "점검 기록", management: "관리", deviceSettings: "장비 설정",
-        splitTitle: "기업 현장 ↔ 관제 센터 · 실시간 협업 화면", splitDescription: "왼쪽에는 현장 카메라와 웨어러블을, 오른쪽에는 구역 현황과 자세 관찰 정보를 표시합니다. 영상은 이 기기에서 처리하며 관제센터로 전송하지 않습니다.", splitDemoState: "브라우저 데모 · 실제 중계 미연결", splitLayoutLabel: "화면 배치", splitHorizontal: "좌우", splitVertical: "상하", splitCompanyNarrow: "현장 좁게", splitHalf: "반반", splitCompanyWide: "현장 넓게", splitSwap: "패널 순서 바꾸기", companyPaneTitle: "① 기업 현장 · 카메라 + 스마트워치", companyPaneStatus: "이 기기에서 처리", centerPaneTitle: "② 관제 센터 · 구역 현황", centerPaneStatus: "요약 보기", splitDataPose: "자세 / 관찰", splitDataLocal: "기기 내 분석", splitDataWearable: "웨어러블", splitDataDemo: "데모 데이터", splitDataVideo: "영상 전송", splitDataNone: "전송 안 함", splitDataRelay: "실시간 중계", splitDataOffline: "연결 안 됨", splitPrivacy: "카메라 사용에는 명시적 권한이 필요합니다. 자세 추정은 이 기기에서만 실행합니다. 데모 페이지는 영상, 스켈레톤 좌표 또는 개인 식별 정보를 업로드하지 않습니다. 관제센터 연결에는 유효한 인증 코드와 사이트 설정이 필요합니다.",
+        splitTitle: "기업 현장 ↔ 관제 센터 · 실시간 협업 화면", splitDescription: "왼쪽에는 현장 카메라와 웨어러블을, 오른쪽에는 구역 현황과 자세 관찰 정보를 표시합니다. 영상은 이 기기에서 처리하며 관제센터로 전송하지 않습니다.", splitDemoState: "브라우저 데모 · 실제 중계 미연결", splitLayoutLabel: "화면 배치", splitHorizontal: "좌우", splitVertical: "상하", splitCompanyNarrow: "현장 좁게", splitHalf: "반반", splitCompanyWide: "현장 넓게", splitSwap: "패널 순서 바꾸기", companyPaneTitle: "① 기업 현장 · 카메라 + 스마트워치", companyPaneStatus: "이 기기에서 처리", centerPaneTitle: "② 관제 센터 · 구역 현황", centerPaneStatus: "요약 보기", splitDataPose: "자세 / 관찰", splitDataLocal: "기기 내 분석", splitDataWearable: "웨어러블", splitDataDemo: "데모 데이터", splitDataVideo: "영상 전송", splitDataNone: "전송 안 함", splitDataRelay: "실시간 중계", splitDataOffline: "연결 안 됨", splitPrivacy: "카메라 사용에는 명시적 권한이 필요합니다. 자세 추정은 이 기기에서만 실행합니다. 데모 페이지는 영상, 스켈레톤 좌표 또는 개인 식별 정보를 업로드하지 않습니다. 관제센터 연결에는 유효한 인증 코드와 사이트 설정이 필요합니다.", cameraDeviceError: "선택한 카메라를 사용할 수 없습니다. 다른 장치를 선택하거나 기본 카메라를 사용하세요.",
         siteName: "제1 생산 작업장", shiftHours: "주간 근무 · 08:00–20:00", industrySafety: "산업 안전", onsiteOverview: "현장 개요", systemRunning: "시스템 정상 운영 중", demoData: "데모 데이터", pageTitle: "현장 안전 개요", pageSubtitle: "현장 작업자, 웨어러블 기기 및 안전 관제 센터를 연결해 작업 상태를 확인합니다.", todayShift: "2026년 11월 18일 · 주간 근무",
         workersOnsite: "현장 작업자", peopleUnit: "명", normalPeople: "● 22명 정상 상태", watchesOnline: "온라인 워치", lastSync: "최근 동기화", justNow: "방금", pendingAlerts: "미처리 경보", confirmOnsite: "현장 확인 필요", todayPatrol: "오늘 점검", timesUnit: "회", patrolChange: "어제보다 +4회",
         navReba: "근골격 평가", mobileReba: "REBA", rebaTitle: "근골격계 건강 · REBA 자세 관찰", rebaSubtitle: "작업 자세와 작업 요인 기반 인간공학 선별", screeningOnly: "관찰 선별", rebaIntro: "대표적인 작업 자세를 관찰하고 주의가 필요한 신체 부위와 작업 요인을 표시하세요. 표시 항목 수는 작업자 검토 계획을 돕기 위한 참고 정보입니다.",
@@ -548,6 +548,7 @@
     let cameraModelReady = false;
     let poseError = false;
     let previousPoseFrame = -1;
+    let cameraRequestId = 0;
     const rebaFactors = [...document.querySelectorAll("[data-reba-factor]")];
     const rebaRecords = [];
     let controlConnected = false;
@@ -1076,6 +1077,7 @@
       if (!navigator.mediaDevices?.getUserMedia) return messages[language].cameraGenericError;
       if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError" || error.name === "SecurityError") return messages[language].cameraPermissionError;
       if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") return messages[language].cameraMissingError;
+      if (error.name === "OverconstrainedError") return messages[language].cameraDeviceError;
       if (error.name === "NotReadableError" || error.name === "TrackStartError" || error.name === "AbortError") return messages[language].cameraUnavailableError;
       return messages[language].cameraGenericError;
     }
@@ -1085,15 +1087,30 @@
         notify(cameraErrorMessage(new Error("getUserMedia unavailable")));
         return;
       }
+      const requestId = ++cameraRequestId;
       cameraStartButton.disabled = true;
       cameraState.textContent = messages[language].cameraRequesting;
       cameraState.classList.add("muted");
       try {
         const deviceId = cameraSelect.value;
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
-          video: deviceId ? { deviceId: { exact: deviceId } } : { facingMode: { ideal: "environment" } }
-        });
+        let stream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: deviceId ? { deviceId: { exact: deviceId } } : { facingMode: { ideal: "environment" } }
+          });
+        } catch (error) {
+          if (!deviceId || !["OverconstrainedError", "NotFoundError"].includes(error.name)) throw error;
+          cameraSelect.value = "";
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: { facingMode: { ideal: "environment" } }
+          });
+        }
+        if (requestId !== cameraRequestId) {
+          stream.getTracks().forEach(track => track.stop());
+          return;
+        }
         cameraStream = stream;
         cameraVideo.srcObject = stream;
         await cameraVideo.play();
@@ -1125,14 +1142,17 @@
           notify(messages[language].cameraModelError);
         }
       } catch (error) {
+        if (requestId !== cameraRequestId) return;
         stopCamera();
+        console.error("Could not start the site camera.", error);
         notify(cameraErrorMessage(error));
       } finally {
-        if (!cameraLive) cameraStartButton.disabled = false;
+        if (requestId === cameraRequestId && !cameraLive) cameraStartButton.disabled = false;
       }
     }
 
     function stopCamera() {
+      cameraRequestId++;
       if (cameraTimer !== null) clearInterval(cameraTimer);
       cameraTimer = null;
       if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
